@@ -7,14 +7,42 @@ public class ProjectERN : ModuleRules
 	public ProjectERN(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] {  });
+		PublicDependencyModuleNames.AddRange(new string[] {
+			"Core",
+			"CoreUObject",
+			"Engine",
+			"InputCore",
+			"EnhancedInput",
+			"AIModule",
+			"StateTreeModule",
+			"GameplayStateTreeModule",
+			"UMG",
+			"Slate"
+		});
+
+		PrivateDependencyModuleNames.AddRange(new string[] { });
+
+		PublicIncludePaths.AddRange(new string[] {
+			"ProjectERN",
+			"ProjectERN/Variant_Platforming",
+			"ProjectERN/Variant_Platforming/Animation",
+			"ProjectERN/Variant_Combat",
+			"ProjectERN/Variant_Combat/AI",
+			"ProjectERN/Variant_Combat/Animation",
+			"ProjectERN/Variant_Combat/Gameplay",
+			"ProjectERN/Variant_Combat/Interfaces",
+			"ProjectERN/Variant_Combat/UI",
+			"ProjectERN/Variant_SideScrolling",
+			"ProjectERN/Variant_SideScrolling/AI",
+			"ProjectERN/Variant_SideScrolling/Gameplay",
+			"ProjectERN/Variant_SideScrolling/Interfaces",
+			"ProjectERN/Variant_SideScrolling/UI"
+		});
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
-		
+
 		// Uncomment if you are using online features
 		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
 

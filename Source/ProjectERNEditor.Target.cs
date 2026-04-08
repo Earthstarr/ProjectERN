@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class ProjectERNEditorTarget : TargetRules
 {
-	public ProjectERNEditorTarget( TargetInfo Target) : base(Target)
+	public ProjectERNEditorTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V6;
