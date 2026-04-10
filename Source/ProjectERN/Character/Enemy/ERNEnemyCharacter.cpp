@@ -32,9 +32,6 @@ void AERNEnemyCharacter::OnDeath()
 
 	if (HasAuthority())
 	{
-		// 경험치 분배
-		DistributeExp();
-
 		// 골드 드롭
 		SpawnGold();
 

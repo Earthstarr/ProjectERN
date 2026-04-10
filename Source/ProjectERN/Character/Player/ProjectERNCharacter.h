@@ -12,6 +12,8 @@ class UCameraComponent;
 class UInputAction;
 struct FInputActionValue;
 enum class ECharacterType : uint8;
+class UERNInventoryComponent;
+class UERNEquipmentComponent;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -31,6 +33,14 @@ class AProjectERNCharacter : public AERNCharacterBase
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
+
+	/** Inventory Component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	UERNInventoryComponent* InventoryComponent;
+
+	/** Equipment Component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	UERNEquipmentComponent* EquipmentComponent;
 
 protected:
 
@@ -100,4 +110,10 @@ public:
 
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	/** Returns InventoryComponent **/
+	FORCEINLINE class UERNInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
+
+	/** Returns EquipmentComponent **/
+	FORCEINLINE class UERNEquipmentComponent* GetEquipmentComponent() const { return EquipmentComponent; }
 };

@@ -13,6 +13,8 @@
 #include "ProjectERN.h"
 #include "AbilitySystemComponent.h"
 #include "Player/ProjectERNPlayerState.h"
+#include "Core/Inventory/ERNInventoryComponent.h"
+#include "Core/Inventory/ERNEquipmentComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -49,6 +51,12 @@ AProjectERNCharacter::AProjectERNCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
+
+	// Create Inventory Component
+	InventoryComponent = CreateDefaultSubobject<UERNInventoryComponent>(TEXT("InventoryComponent"));
+
+	// Create Equipment Component
+	EquipmentComponent = CreateDefaultSubobject<UERNEquipmentComponent>(TEXT("EquipmentComponent"));
 
 	// GAS 컴포넌트는 부모 클래스(ERNCharacterBase)에서 생성됨
 
