@@ -72,3 +72,9 @@ Plugins/**/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# Project documentation (Claude AI generated)
+claude.md
+
+# Assets folder (large asset files)
+Content/Assets/*
