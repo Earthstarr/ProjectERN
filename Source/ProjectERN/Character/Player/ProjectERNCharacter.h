@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "Character/ERNCharacterBase.h"
 #include "Logging/LogMacros.h"
 #include "ProjectERNCharacter.generated.h"
 
@@ -11,8 +11,6 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
 struct FInputActionValue;
-class UAbilitySystemComponent;
-class UERNAttributeSet;
 enum class ECharacterType : uint8;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -22,7 +20,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
  *  Implements a controllable orbiting camera
  */
 UCLASS(abstract)
-class AProjectERNCharacter : public ACharacter
+class AProjectERNCharacter : public AERNCharacterBase
 {
 	GENERATED_BODY()
 
@@ -33,14 +31,6 @@ class AProjectERNCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
-
-	/** Ability System Component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="GAS", meta = (AllowPrivateAccess = "true"))
-	UAbilitySystemComponent* AbilitySystemComponent;
-
-	/** Attribute Set */
-	UPROPERTY()
-	const UERNAttributeSet* AttributeSet;
 
 protected:
 
@@ -70,7 +60,7 @@ protected:
 public:
 
 	/** Constructor */
-	AProjectERNCharacter();	
+	AProjectERNCharacter();
 
 protected:
 
@@ -110,11 +100,4 @@ public:
 
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-
-	/** Returns AbilitySystemComponent **/
-	FORCEINLINE class UAbilitySystemComponent* GetAbilitySystemComponent() const { return AbilitySystemComponent; }
-
-	/** Returns AttributeSet **/
-	FORCEINLINE const UERNAttributeSet* GetAttributeSet() const { return AttributeSet; }
 };
-

@@ -1,0 +1,78 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
+#include "Character/ERNCharacterBase.h"
+#include "AbilitySystemComponent.h"
+#include "Core/ERNAttributeSet.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
+
+AERNCharacterBase::AERNCharacterBase()
+{
+	PrimaryActorTick.bCanEverTick = false;
+
+	// GAS 컴포넌트 생성
+	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+
+	AttributeSet = CreateDefaultSubobject<UERNAttributeSet>(TEXT("AttributeSet"));
+}
+
+void AERNCharacterBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// AttributeSet 초기화는 자식 클래스에서 처리
+}
+
+UAbilitySystemComponent* AERNCharacterBase::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
+float AERNCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (bIsDead)
+	{
+		return 0.0f;
+	}
+
+	const float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	if (AttributeSet && ActualDamage > 0.0f)
+	{
+		// AttributeSet의 Health 감소
+		const float NewHealth = FMath::Max(0.0f, AttributeSet->GetHealth() - ActualDamage);
+		AttributeSet->SetHealth(NewHealth);
+
+		UE_LOG(LogTemp, Log, TEXT("%s took %.2f damage. Health: %.2f"), *GetName(), ActualDamage, NewHealth);
+
+		// 사망 체크
+		if (NewHealth <= 0.0f)
+		{
+			OnDeath();
+		}
+	}
+
+	return ActualDamage;
+}
+
+void AERNCharacterBase::OnDeath()
+{
+	if (bIsDead)
+	{
+		return;
+	}
+
+	bIsDead = true;
+
+	UE_LOG(LogTemp, Log, TEXT("%s has died."), *GetName());
+
+	// 이동 비활성화
+	GetCharacterMovement()->DisableMovement();
+
+	// 충돌 비활성화
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// 자식 클래스에서 추가 사망 처리 구현 (애니메이션, 이펙트 등)
+}

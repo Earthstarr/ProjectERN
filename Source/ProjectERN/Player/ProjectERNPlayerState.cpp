@@ -2,7 +2,7 @@
 
 #include "Player/ProjectERNPlayerState.h"
 #include "Net/UnrealNetwork.h"
-#include "Player/ProjectERNCharacter.h"
+#include "Character/Player/ProjectERNCharacter.h"
 #include "Core/ERNAttributeSet.h"
 
 AProjectERNPlayerState::AProjectERNPlayerState()
