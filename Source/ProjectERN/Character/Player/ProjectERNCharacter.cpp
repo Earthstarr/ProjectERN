@@ -15,6 +15,9 @@
 #include "Player/ProjectERNPlayerState.h"
 #include "Core/Inventory/ERNInventoryComponent.h"
 #include "Core/Inventory/ERNEquipmentComponent.h"
+#include "Core/Inventory/ERNWeaponBase.h"
+#include "Animation/AnimInstance.h"
+#include "Animation/AnimMontage.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -96,6 +99,10 @@ void AProjectERNCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AProjectERNCharacter::Look);
+
+		// Attacking
+		EnhancedInputComponent->BindAction(LightAttackAction, ETriggerEvent::Started, this, &AProjectERNCharacter::LightAttack);
+		EnhancedInputComponent->BindAction(HeavyAttackAction, ETriggerEvent::Started, this, &AProjectERNCharacter::HeavyAttack);
 	}
 	else
 	{
@@ -161,4 +168,50 @@ void AProjectERNCharacter::DoJumpEnd()
 {
 	// signal the character to stop jumping
 	StopJumping();
+}
+
+void AProjectERNCharacter::LightAttack(const FInputActionValue& Value)
+{
+	if (EquipmentComponent && EquipmentComponent->CurrentWeapon)
+	{
+		if (UAnimMontage* Montage = EquipmentComponent->CurrentWeapon->LightAttackMontage)
+		{
+			if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+			{
+				AnimInstance->Montage_Play(Montage);
+				UE_LOG(LogTemp, Log, TEXT("Playing Light Attack Montage"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No LightAttackMontage set on weapon"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No weapon equipped"));
+	}
+}
+
+void AProjectERNCharacter::HeavyAttack(const FInputActionValue& Value)
+{
+	if (EquipmentComponent && EquipmentComponent->CurrentWeapon)
+	{
+		if (UAnimMontage* Montage = EquipmentComponent->CurrentWeapon->HeavyAttackMontage)
+		{
+			if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+			{
+				AnimInstance->Montage_Play(Montage);
+				UE_LOG(LogTemp, Log, TEXT("Playing Heavy Attack Montage"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No HeavyAttackMontage set on weapon"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No weapon equipped"));
+	}
 }
