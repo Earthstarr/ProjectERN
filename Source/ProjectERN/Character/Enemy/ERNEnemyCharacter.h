@@ -39,12 +39,12 @@ public:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	// 체력바 표시 (피격/락온 시 호출)
-	UFUNCTION(BlueprintCallable, Category = "UI")
-	void ShowHealthBar();
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "UI")
+	void Multicast_ShowHealthBar();
 
 	// 체력바 숨김
-	UFUNCTION(BlueprintCallable, Category = "UI")
-	void HideHealthBar();
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "UI")
+	void Multicast_HideHealthBar();
 
 protected:
 	virtual void BeginPlay() override;
@@ -58,7 +58,7 @@ protected:
 
 	// 피격 후 체력바 자동 숨김까지 대기 시간 (블루프린트에서 수정 가능)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
-	float HealthBarHideDelay = 3.0f;
+	float HealthBarHideDelay = 15.0f;
 
 private:
 	FTimerHandle HealthBarHideTimerHandle;

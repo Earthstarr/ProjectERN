@@ -51,13 +51,13 @@ float AERNEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 
 	if (ActualDamage > 0.0f)
 	{
-		ShowHealthBar();
+		Multicast_ShowHealthBar();
 	}
 
 	return ActualDamage;
 }
 
-void AERNEnemyCharacter::ShowHealthBar()
+void AERNEnemyCharacter::Multicast_ShowHealthBar_Implementation()
 {
 	if (!HealthBarWidget) return;
 
@@ -67,13 +67,13 @@ void AERNEnemyCharacter::ShowHealthBar()
 	GetWorld()->GetTimerManager().SetTimer(
 		HealthBarHideTimerHandle,
 		this,
-		&AERNEnemyCharacter::HideHealthBar,
+		&AERNEnemyCharacter::Multicast_HideHealthBar,
 		HealthBarHideDelay,
 		false
 	);
 }
 
-void AERNEnemyCharacter::HideHealthBar()
+void AERNEnemyCharacter::Multicast_HideHealthBar_Implementation()
 {
 	if (!HealthBarWidget) return;
 
