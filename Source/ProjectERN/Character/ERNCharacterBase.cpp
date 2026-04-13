@@ -5,6 +5,7 @@
 #include "Core/ERNAttributeSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Abilities/GameplayAbility.h"
 
 AERNCharacterBase::AERNCharacterBase()
 {
@@ -21,8 +22,33 @@ AERNCharacterBase::AERNCharacterBase()
 void AERNCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+}
 
-	// AttributeSet 초기화는 자식 클래스에서 처리
+void AERNCharacterBase::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	// 서버에서만 어빌리티 부여
+	if (HasAuthority())
+	{
+		GiveDefaultAbilities();
+	}
+}
+
+void AERNCharacterBase::GiveDefaultAbilities()
+{
+	if (!AbilitySystemComponent)
+	{
+		return;
+	}
+
+	for (TSubclassOf<UGameplayAbility>& AbilityClass : DefaultAbilities)
+	{
+		if (AbilityClass)
+		{
+			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityClass, 1));
+		}
+	}
 }
 
 UAbilitySystemComponent* AERNCharacterBase::GetAbilitySystemComponent() const

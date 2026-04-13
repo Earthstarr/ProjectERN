@@ -3,6 +3,8 @@
 #include "Character/Enemy/ERNEnemyCharacter.h"
 #include "Core/ERNAttributeSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/WidgetComponent.h"
+#include "UI/ERNEnemyHealthBarWidget.h"
 
 AERNEnemyCharacter::AERNEnemyCharacter()
 {
@@ -13,6 +15,14 @@ AERNEnemyCharacter::AERNEnemyCharacter()
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 200.0f, 0.0f);
+
+	// 머리 위 체력바 위젯 컴포넌트
+	HealthBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBarWidget"));
+	HealthBarWidget->SetupAttachment(RootComponent);
+	HealthBarWidget->SetRelativeLocation(FVector(0.0f, 0.0f, 120.0f));
+	HealthBarWidget->SetWidgetSpace(EWidgetSpace::Screen);
+	HealthBarWidget->SetDrawSize(FVector2D(150.0f, 20.0f));
+	HealthBarWidget->SetVisibility(false);
 }
 
 void AERNEnemyCharacter::BeginPlay()
@@ -24,6 +34,50 @@ void AERNEnemyCharacter::BeginPlay()
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	}
+
+	// 체력바 위젯 초기화
+	if (HealthBarWidget)
+	{
+		if (UERNEnemyHealthBarWidget* Widget = Cast<UERNEnemyHealthBarWidget>(HealthBarWidget->GetUserWidgetObject()))
+		{
+			Widget->InitWidget(this);
+		}
+	}
+}
+
+float AERNEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	const float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	if (ActualDamage > 0.0f)
+	{
+		ShowHealthBar();
+	}
+
+	return ActualDamage;
+}
+
+void AERNEnemyCharacter::ShowHealthBar()
+{
+	if (!HealthBarWidget) return;
+
+	HealthBarWidget->SetVisibility(true);
+
+	// 기존 타이머 초기화 후 재시작
+	GetWorld()->GetTimerManager().SetTimer(
+		HealthBarHideTimerHandle,
+		this,
+		&AERNEnemyCharacter::HideHealthBar,
+		HealthBarHideDelay,
+		false
+	);
+}
+
+void AERNEnemyCharacter::HideHealthBar()
+{
+	if (!HealthBarWidget) return;
+
+	HealthBarWidget->SetVisibility(false);
 }
 
 void AERNEnemyCharacter::OnDeath()

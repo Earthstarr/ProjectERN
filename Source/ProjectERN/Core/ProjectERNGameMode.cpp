@@ -1,8 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "ProjectERNGameMode.h"
-
+#include "Core/ProjectERNGameMode.h"
 AProjectERNGameMode::AProjectERNGameMode()
 {
-	// stub
 }

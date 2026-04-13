@@ -78,3 +78,13 @@ claude.md
 
 # Assets folder (large asset files)
 Content/Assets/*
+
+# IDE Plugins (Rider, etc.)
+Plugins/Developer/
+.idea/
+
+# Claude AI settings
+.claude/
+
+# VS Code
+.vscode/

@@ -27,10 +27,10 @@ public:
 
 	// 무기 스탯
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stats")
-	float AttackDamage = 10.0f;
+	float LightAttackDamage = 10.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stats")
-	float AttackSpeed = 1.0f;
+	float HeavyAttackDamage = 20.0f;
 
 	// 무기 전용 애니메이션 몽타주
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Animations")

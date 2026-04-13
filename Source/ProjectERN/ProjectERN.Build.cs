@@ -23,7 +23,8 @@ public class ProjectERN : ModuleRules
 			"GameplayTags",
 			"GameplayTasks",
 			"OnlineSubsystem",
-			"OnlineSubsystemUtils"
+			"OnlineSubsystemUtils",
+			"Niagara"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

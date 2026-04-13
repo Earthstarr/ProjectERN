@@ -15,9 +15,7 @@
 #include "Player/ProjectERNPlayerState.h"
 #include "Core/Inventory/ERNInventoryComponent.h"
 #include "Core/Inventory/ERNEquipmentComponent.h"
-#include "Core/Inventory/ERNWeaponBase.h"
-#include "Animation/AnimInstance.h"
-#include "Animation/AnimMontage.h"
+#include "Core/ERNGameplayTags.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -70,6 +68,11 @@ AProjectERNCharacter::AProjectERNCharacter()
 	CharacterType = ECharacterType::Warrior;
 }
 
+void AProjectERNCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 void AProjectERNCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
@@ -112,6 +115,12 @@ void AProjectERNCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 void AProjectERNCharacter::Move(const FInputActionValue& Value)
 {
+	// 공격 중이면 이동 불가
+	if (AbilitySystemComponent && AbilitySystemComponent->HasMatchingGameplayTag(TAG_State_Combat_Attacking))
+	{
+		return;
+	}
+
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
@@ -172,46 +181,16 @@ void AProjectERNCharacter::DoJumpEnd()
 
 void AProjectERNCharacter::LightAttack(const FInputActionValue& Value)
 {
-	if (EquipmentComponent && EquipmentComponent->CurrentWeapon)
+	if (AbilitySystemComponent)
 	{
-		if (UAnimMontage* Montage = EquipmentComponent->CurrentWeapon->LightAttackMontage)
-		{
-			if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
-			{
-				AnimInstance->Montage_Play(Montage);
-				UE_LOG(LogTemp, Log, TEXT("Playing Light Attack Montage"));
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("No LightAttackMontage set on weapon"));
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No weapon equipped"));
+		AbilitySystemComponent->TryActivateAbilitiesByTag(FGameplayTagContainer(TAG_Ability_Attack_Light));
 	}
 }
 
 void AProjectERNCharacter::HeavyAttack(const FInputActionValue& Value)
 {
-	if (EquipmentComponent && EquipmentComponent->CurrentWeapon)
+	if (AbilitySystemComponent)
 	{
-		if (UAnimMontage* Montage = EquipmentComponent->CurrentWeapon->HeavyAttackMontage)
-		{
-			if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
-			{
-				AnimInstance->Montage_Play(Montage);
-				UE_LOG(LogTemp, Log, TEXT("Playing Heavy Attack Montage"));
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("No HeavyAttackMontage set on weapon"));
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No weapon equipped"));
+		AbilitySystemComponent->TryActivateAbilitiesByTag(FGameplayTagContainer(TAG_Ability_Attack_Heavy));
 	}
 }

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/ERNCharacterBase.h"
 #include "Logging/LogMacros.h"
+#include "GameplayTagContainer.h"
 #include "ProjectERNCharacter.generated.h"
 
 class USpringArmComponent;
@@ -81,6 +82,9 @@ public:
 	AProjectERNCharacter();
 
 protected:
+
+	/** Called when the game starts or when spawned */
+	virtual void BeginPlay() override;
 
 	/** Initialize input action bindings */
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

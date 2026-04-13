@@ -1,0 +1,84 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
+#include "Core/Inventory/ERNMeleeWeapon.h"
+#include "Components/BoxComponent.h"
+#include "GameFramework/Character.h"
+#include "NiagaraFunctionLibrary.h"
+#include "Engine/DamageEvents.h"
+#include "Character/Enemy/ERNEnemyCharacter.h"
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "Core/ERNGameplayTags.h"
+
+AERNMeleeWeapon::AERNMeleeWeapon()
+{
+	HitboxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("HitboxComponent"));
+	HitboxComponent->SetupAttachment(RootComponent);
+	HitboxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitboxComponent->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	HitboxComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+	HitboxComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+
+	HitboxComponent->OnComponentBeginOverlap.AddDynamic(this, &AERNMeleeWeapon::OnHitboxOverlap);
+}
+
+void AERNMeleeWeapon::EnableHitbox()
+{
+	HitActors.Empty();
+	HitboxComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void AERNMeleeWeapon::DisableHitbox()
+{
+	HitboxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitActors.Empty();
+}
+
+void AERNMeleeWeapon::OnHitboxOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+	bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (!HasAuthority()) return;
+
+	if (!OtherActor || OtherActor == GetOwner() || HitActors.Contains(OtherActor))
+	{
+		return;
+	}
+
+	// 적 캐릭터에게만 데미지 적용
+	if (!OtherActor->IsA<AERNEnemyCharacter>())
+	{
+		return;
+	}
+
+	HitActors.Add(OtherActor);
+
+	// 데미지 적용
+	AController* InstigatorController = GetOwner()
+		? Cast<ACharacter>(GetOwner())->GetController()
+		: nullptr;
+
+	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+	UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OwnerCharacter);
+
+	// 태그로 강공 / 약공 구분
+	const float DamageToApply = ASC && ASC->HasMatchingGameplayTag(TAG_Ability_Attack_Heavy)
+		? HeavyAttackDamage
+		: LightAttackDamage;
+
+	OtherActor->TakeDamage(DamageToApply, FDamageEvent(), InstigatorController, GetOwner());
+
+	// 히트 이펙트 - 모든 클라이언트에 멀티캐스트
+	if (HitEffect)
+	{
+		Multicast_PlayHitEffect(SweepResult.ImpactPoint, SweepResult.ImpactNormal.Rotation());
+	}
+}
+
+void AERNMeleeWeapon::Multicast_PlayHitEffect_Implementation(FVector Location, FRotator Rotation)
+{
+	if (HitEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitEffect, Location, Rotation);
+	}
+}

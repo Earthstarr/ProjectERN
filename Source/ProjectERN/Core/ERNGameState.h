@@ -17,7 +17,7 @@ class PROJECTERN_API AERNGameState : public AGameStateBase
 public:
 	AERNGameState();
 
-	// 플레이어 배열 변경 이벤트 (블루프린트에서 바인딩 가능)
+	// 플레이어 배열 변경 이벤트
 	UPROPERTY(BlueprintAssignable, Category = "GameState")
 	FOnPlayerArrayChanged OnPlayerArrayChanged;
 
