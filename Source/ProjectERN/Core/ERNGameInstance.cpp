@@ -85,7 +85,7 @@ void UERNGameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSucce
 	}
 }
 
-void UERNGameInstance::FindSessions()
+void UERNGameInstance::FindSessions(FString SearchQuery)
 {
 	if (!SessionInterface.IsValid())
 	{
@@ -93,12 +93,15 @@ void UERNGameInstance::FindSessions()
 		return;
 	}
 
+	// 검색어 저장
+	CurrentSearchQuery = SearchQuery;
+
 	// 세션 검색 설정
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
 	SessionSearch->bIsLanQuery = true;
 	SessionSearch->MaxSearchResults = 20;
 
-	UE_LOG(LogTemp, Log, TEXT("Starting session search..."));
+	UE_LOG(LogTemp, Log, TEXT("Starting session search with query: '%s'..."), *SearchQuery);
 
 	// 세션 검색 시작
 	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
@@ -108,6 +111,8 @@ void UERNGameInstance::FindSessions()
 void UERNGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 {
 	SessionSearchResults.Empty();
+	SessionNames.Empty();
+	FilteredSessionIndices.Empty();
 
 	UE_LOG(LogTemp, Log, TEXT("OnFindSessionsComplete - Success: %s"), bWasSuccessful ? TEXT("true") : TEXT("false"));
 
@@ -115,20 +120,36 @@ void UERNGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Found %d sessions"), SessionSearch->SearchResults.Num());
 
-		// 검색 결과를 배열에 저장
+		int32 FilteredCount = 0;
+
+		// 검색 결과를 배열에 저장 (필터링 적용)
 		for (int32 i = 0; i < SessionSearch->SearchResults.Num(); i++)
 		{
 			FString ServerName;
 			SessionSearch->SearchResults[i].Session.SessionSettings.Get(FName("SERVER_NAME"), ServerName);
+
+			// 검색어 필터링: 검색어가 비어있으면 모든 세션, 있으면 이름에 포함된 세션만
+			bool bMatchesFilter = CurrentSearchQuery.IsEmpty() || ServerName.Contains(CurrentSearchQuery);
+
+			if (!bMatchesFilter)
+			{
+				UE_LOG(LogTemp, Log, TEXT("Session %d filtered out: '%s' does not match '%s'"), i, *ServerName, *CurrentSearchQuery);
+				continue;
+			}
 
 			int32 CurrentPlayers = SessionSearch->SearchResults[i].Session.SessionSettings.NumPublicConnections - SessionSearch->SearchResults[i].Session.NumOpenPublicConnections;
 			int32 MaxPlayers = SessionSearch->SearchResults[i].Session.SessionSettings.NumPublicConnections;
 
 			FString SessionInfo = FString::Printf(TEXT("%s (%d/%d)"), *ServerName, CurrentPlayers, MaxPlayers);
 			SessionSearchResults.Add(SessionInfo);
+			SessionNames.Add(ServerName);
+			FilteredSessionIndices.Add(i); // 원본 인덱스 저장
 
-			UE_LOG(LogTemp, Log, TEXT("Session %d: %s - Ping: %d"), i, *SessionInfo, SessionSearch->SearchResults[i].PingInMs);
+			UE_LOG(LogTemp, Log, TEXT("Filtered session %d: %s (original index: %d) - Ping: %d"), FilteredCount, *SessionInfo, i, SessionSearch->SearchResults[i].PingInMs);
+			FilteredCount++;
 		}
+
+		UE_LOG(LogTemp, Log, TEXT("Total sessions found: %d, Matching filter: %d"), SessionSearch->SearchResults.Num(), FilteredCount);
 	}
 	else
 	{
@@ -144,15 +165,28 @@ void UERNGameInstance::JoinSessionByIndex(int32 SessionIndex)
 		return;
 	}
 
-	if (SessionIndex < 0 || SessionIndex >= SessionSearch->SearchResults.Num())
+	// 필터링된 인덱스 범위 확인
+	if (SessionIndex < 0 || SessionIndex >= FilteredSessionIndices.Num())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Invalid session index!"));
+		UE_LOG(LogTemp, Warning, TEXT("Invalid filtered session index: %d (max: %d)"), SessionIndex, FilteredSessionIndices.Num() - 1);
 		return;
 	}
 
+	// 필터링된 인덱스를 원본 인덱스로 변환
+	int32 OriginalIndex = FilteredSessionIndices[SessionIndex];
+
+	// 원본 인덱스 유효성 확인
+	if (OriginalIndex < 0 || OriginalIndex >= SessionSearch->SearchResults.Num())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Invalid original session index: %d"), OriginalIndex);
+		return;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Joining session: filtered index %d -> original index %d"), SessionIndex, OriginalIndex);
+
 	// 세션 참가
 	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
-	SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SessionSearch->SearchResults[SessionIndex]);
+	SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SessionSearch->SearchResults[OriginalIndex]);
 }
 
 void UERNGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)

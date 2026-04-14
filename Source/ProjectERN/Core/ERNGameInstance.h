@@ -21,9 +21,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void HostSession(FString ServerName, int32 MaxPlayers = 3);
 
-	// 세션 검색
+	// 세션 검색 (SearchQuery가 비어있으면 모든 세션, 있으면 해당 이름 필터링)
 	UFUNCTION(BlueprintCallable, Category = "Network")
-	void FindSessions();
+	void FindSessions(FString SearchQuery = "");
 
 	// 세션 참가 (Join)
 	UFUNCTION(BlueprintCallable, Category = "Network")
@@ -41,6 +41,18 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Network")
 	TArray<FString> GetSessionList() const { return SessionSearchResults; }
 
+	// 현재 플레이어 닉네임 설정
+	UFUNCTION(BlueprintCallable, Category = "Network")
+	void SetPlayerNickname(FString Nickname) { CurrentPlayerNickname = Nickname; }
+
+	// 현재 플레이어 닉네임 가져오기
+	UFUNCTION(BlueprintPure, Category = "Network")
+	FString GetPlayerNickname() const { return CurrentPlayerNickname; }
+
+	// 현재 플레이어 닉네임
+	UPROPERTY(BlueprintReadWrite, Category = "Network")
+	FString CurrentPlayerNickname;
+
 protected:
 	// 세션 인터페이스
 	IOnlineSessionPtr SessionInterface;
@@ -51,6 +63,16 @@ protected:
 	// 블루프린트용 검색 결과
 	UPROPERTY(BlueprintReadOnly, Category = "Network")
 	TArray<FString> SessionSearchResults;
+
+	// 방 이름만 저장 (SessionSearchResults와 인덱스 동기화)
+	UPROPERTY(BlueprintReadOnly, Category = "Network")
+	TArray<FString> SessionNames;
+
+	// 검색어 저장
+	FString CurrentSearchQuery;
+
+	// 필터링된 세션의 원본 인덱스 매핑 (UI 인덱스 -> 원본 SearchResults 인덱스)
+	TArray<int32> FilteredSessionIndices;
 
 	// 세션 생성 완료 콜백
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);

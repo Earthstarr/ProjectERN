@@ -46,11 +46,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUserWidget> PartyStatusContainerClass;
 
+	// 파티 상태 위젯을 숨길 맵 이름 목록 (부분 일치)
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TArray<FString> HidePartyWidgetMapNames;
+
 	/** Gameplay initialization */
 	virtual void BeginPlay() override;
 
 	// UI 생성 (약간 지연)
 	void CreatePartyUI();
+
+	// 닉네임 전송 재시도 (PlayerState가 준비될 때까지)
+	void TrySendNickname();
 
 	/** Input mapping context setup */
 	virtual void SetupInputComponent() override;
