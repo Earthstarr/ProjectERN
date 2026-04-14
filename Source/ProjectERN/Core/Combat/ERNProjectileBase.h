@@ -10,6 +10,7 @@ class USphereComponent;
 class UProjectileMovementComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
+class UStaticMeshComponent;
 
 /**
  * AERNProjectileBase - 원거리 투사체 베이스
@@ -34,6 +35,10 @@ public:
 	// 충돌 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile")
 	USphereComponent* CollisionComponent;
+
+	// 투사체 비주얼 메시 (화살, 마법구 등)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile")
+	UStaticMeshComponent* ProjectileMesh;
 
 	// 이동 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile")

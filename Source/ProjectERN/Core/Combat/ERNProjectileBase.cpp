@@ -2,6 +2,7 @@
 
 #include "Core/Combat/ERNProjectileBase.h"
 #include "Components/SphereComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
@@ -15,15 +16,24 @@ AERNProjectileBase::AERNProjectileBase()
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
 	CollisionComponent->InitSphereRadius(15.0f);
-	CollisionComponent->SetCollisionProfileName(TEXT("Projectile"));
+	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	CollisionComponent->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	CollisionComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	CollisionComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
+	CollisionComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Block);
+	CollisionComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
 	CollisionComponent->OnComponentHit.AddDynamic(this, &AERNProjectileBase::OnHit);
 	RootComponent = CollisionComponent;
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
-	ProjectileMovement->InitialSpeed = 3000.0f;
-	ProjectileMovement->MaxSpeed = 3000.0f;
+	ProjectileMovement->InitialSpeed = 1200.0f;
+	ProjectileMovement->MaxSpeed = 1200.0f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
-	ProjectileMovement->ProjectileGravityScale = 0.1f;
+	ProjectileMovement->ProjectileGravityScale = 0.0f;
+
+	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh"));
+	ProjectileMesh->SetupAttachment(RootComponent);
+	ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	TrailEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TrailEffect"));
 	TrailEffect->SetupAttachment(RootComponent);
@@ -53,15 +63,12 @@ void AERNProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
 	{
 		return;
 	}
-	
-	// 적 캐릭터에게만 데미지 적용
-	if (!OtherActor->IsA<AERNEnemyCharacter>())
-	{
-		return;
-	}
 
-	// 데미지 적용
-	OtherActor->TakeDamage(Damage, FDamageEvent(), GetInstigatorController(), GetOwner());
+	// 적 캐릭터에게만 데미지 적용
+	if (OtherActor->IsA<AERNEnemyCharacter>())
+	{
+		OtherActor->TakeDamage(Damage, FDamageEvent(), GetInstigatorController(), GetOwner());
+	}
 
 	// 착탄 이펙트 - 모든 클라이언트에 멀티캐스트
 	if (ImpactEffect)

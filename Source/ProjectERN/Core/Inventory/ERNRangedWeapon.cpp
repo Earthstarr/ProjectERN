@@ -2,34 +2,54 @@
 
 #include "Core/Inventory/ERNRangedWeapon.h"
 #include "Core/Combat/ERNProjectileBase.h"
+#include "Components/ArrowComponent.h"
 #include "NiagaraFunctionLibrary.h"
 
 AERNRangedWeapon::AERNRangedWeapon()
 {
+	// MuzzlePoint: 스태틱 메시는 소켓 미지원이므로 ArrowComponent로 발사 위치를 표시
+	// 에디터에서 WeaponMesh 자식으로 위치/회전 조정
+	MuzzlePoint = CreateDefaultSubobject<UArrowComponent>(TEXT("MuzzlePoint"));
+	MuzzlePoint->SetupAttachment(WeaponMesh);
+	MuzzlePoint->ArrowColor = FColor::Red;
+	MuzzlePoint->bHiddenInGame = true;
 }
 
-void AERNRangedWeapon::SpawnProjectile()
+void AERNRangedWeapon::SpawnProjectile(bool bIsHeavyAttack)
 {
-	if (!ProjectileClass || !GetOwner())
+	// 공격 종류에 따라 투사체 클래스 선택
+	// 강공격 클래스가 미설정이면 약공격 클래스로 폴백
+	TSubclassOf<AERNProjectileBase> SelectedProjectile = bIsHeavyAttack && HeavyProjectileClass
+		? HeavyProjectileClass
+		: LightProjectileClass;
+
+	if (!SelectedProjectile || !GetOwner())
 	{
 		return;
 	}
 
-	// 발사구 위치/방향 계산
+	// 발사 위치: MuzzlePoint → WeaponMesh 소켓 → 무기 위치 순으로 결정
+	// 발사 방향: 캐릭터 전방
 	FVector SpawnLocation = GetActorLocation();
 	FRotator SpawnRotation = GetOwner()->GetActorRotation();
 
-	// 무기 메시에 MuzzleSocket이 있으면 해당 위치 사용
-	if (WeaponMesh && WeaponMesh->DoesSocketExist(MuzzleSocketName))
+	if (MuzzlePoint)
+	{
+		SpawnLocation = MuzzlePoint->GetComponentLocation();
+	}
+	else if (WeaponMesh && WeaponMesh->DoesSocketExist(MuzzleSocketName))
 	{
 		SpawnLocation = WeaponMesh->GetSocketLocation(MuzzleSocketName);
-		SpawnRotation = WeaponMesh->GetSocketRotation(MuzzleSocketName);
 	}
 
-	// 나이아가라 이펙트 - 모든 클라이언트에 멀티캐스트
-	if (MuzzleEffect)
+	// 캐릭터 전방 방향
+	SpawnRotation = GetOwner()->GetActorForwardVector().Rotation();
+
+	// 공격 종류에 따라 이펙트 선택 (강공격 이펙트 미설정 시 기본 이펙트 사용)
+	UNiagaraSystem* SelectedEffect = bIsHeavyAttack && HeavyMuzzleEffect ? HeavyMuzzleEffect : LightMuzzleEffect;
+	if (SelectedEffect)
 	{
-		Multicast_PlayMuzzleEffect(SpawnLocation, SpawnRotation);
+		Multicast_PlayMuzzleEffect(SpawnLocation, SpawnRotation, SelectedEffect);
 	}
 
 	// 투사체 스폰
@@ -38,13 +58,13 @@ void AERNRangedWeapon::SpawnProjectile()
 	SpawnParams.Instigator = Cast<APawn>(GetOwner());
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	GetWorld()->SpawnActor<AERNProjectileBase>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
+	GetWorld()->SpawnActor<AERNProjectileBase>(SelectedProjectile, SpawnLocation, SpawnRotation, SpawnParams);
 }
 
-void AERNRangedWeapon::Multicast_PlayMuzzleEffect_Implementation(FVector Location, FRotator Rotation)
+void AERNRangedWeapon::Multicast_PlayMuzzleEffect_Implementation(FVector Location, FRotator Rotation, UNiagaraSystem* Effect)
 {
-	if (MuzzleEffect)
+	if (Effect)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), MuzzleEffect, Location, Rotation);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Effect, Location, Rotation);
 	}
 }

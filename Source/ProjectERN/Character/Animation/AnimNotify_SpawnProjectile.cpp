@@ -16,10 +16,11 @@ void UAnimNotify_SpawnProjectile::Notify(USkeletalMeshComponent* MeshComp, UAnim
 	UERNEquipmentComponent* Equipment = Character->FindComponentByClass<UERNEquipmentComponent>();
 	if (!Equipment) return;
 	
-	// 장착중인 무기의 SpawnProjectile 실행
+	// 현재 재생 중인 몽타주가 강공격 몽타주인지 확인
 	AERNRangedWeapon* RangedWeapon = Cast<AERNRangedWeapon>(Equipment->CurrentWeapon);
 	if (RangedWeapon)
 	{
-		RangedWeapon->SpawnProjectile();
+		const bool bIsHeavyAttack = (Animation == RangedWeapon->HeavyAttackMontage);
+		RangedWeapon->SpawnProjectile(bIsHeavyAttack);
 	}
 }
