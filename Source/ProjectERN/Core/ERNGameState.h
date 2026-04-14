@@ -21,6 +21,13 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "GameState")
 	FOnPlayerArrayChanged OnPlayerArrayChanged;
 
+	// 모든 플레이어 준비 상태 확인 (서버에서만 호출)
+	void CheckAllPlayersReady();
+
+	// 필드맵 이름 (블루프린트에서 설정 가능, 예: "Map_Field")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
+	FString FieldMapName = TEXT("Map_Field");
+
 protected:
 	// PlayerArray 리플리케이션 콜백
 	virtual void AddPlayerState(APlayerState* PlayerState) override;

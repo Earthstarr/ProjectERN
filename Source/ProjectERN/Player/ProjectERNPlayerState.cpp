@@ -4,6 +4,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Character/Player/ProjectERNCharacter.h"
 #include "Core/ERNAttributeSet.h"
+#include "Core/ERNGameState.h"
 
 AProjectERNPlayerState::AProjectERNPlayerState()
 {
@@ -45,6 +46,22 @@ void AProjectERNPlayerState::Server_SetReady_Implementation(bool bReady)
 {
 	bIsReady = bReady;
 	UE_LOG(LogTemp, Log, TEXT("Player %s ready state: %s"), *PlayerNickname, bIsReady ? TEXT("Ready") : TEXT("Not Ready"));
+
+	// 서버에서도 델리게이트 브로드캐스트 (클라이언트는 OnRep_IsReady에서 자동 호출)
+	OnReadyStateChanged.Broadcast(bIsReady);
+
+	// GameState에 준비 상태 체크 요청
+	if (AERNGameState* GameState = GetWorld()->GetGameState<AERNGameState>())
+	{
+		GameState->CheckAllPlayersReady();
+	}
+}
+
+void AProjectERNPlayerState::OnRep_IsReady()
+{
+	// 준비 상태가 리플리케이트되면 델리게이트 브로드캐스트
+	UE_LOG(LogTemp, Log, TEXT("OnRep_IsReady: Player %s is now %s"), *PlayerNickname, bIsReady ? TEXT("Ready") : TEXT("Not Ready"));
+	OnReadyStateChanged.Broadcast(bIsReady);
 }
 
 // AttributeSet에서 값 가져오기

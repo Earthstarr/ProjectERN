@@ -3,8 +3,10 @@
 
 #include "Player/ProjectERNPlayerController.h"
 #include "EnhancedInputSubsystems.h"
+#include "EnhancedInputComponent.h"
 #include "Engine/LocalPlayer.h"
 #include "InputMappingContext.h"
+#include "InputAction.h"
 #include "Blueprint/UserWidget.h"
 #include "ProjectERN.h"
 #include "Widgets/Input/SVirtualJoystick.h"
@@ -34,12 +36,12 @@ void AProjectERNPlayerController::BeginPlay()
 		}
 	}
 
-	// UI 생성 (로컬 플레이어만)
+	// 현재 맵 이름 가져오기 (UI 생성용)
+	FString CurrentMapName = GetWorld()->GetMapName();
+
+	// 파티 상태 위젯 생성 (로컬 플레이어만)
 	if (IsLocalPlayerController() && PartyStatusContainerClass)
 	{
-		// 현재 맵 이름 가져오기
-		FString CurrentMapName = GetWorld()->GetMapName();
-
 		// 숨겨야 할 맵인지 확인
 		bool bShouldHide = false;
 		for (const FString& MapName : HidePartyWidgetMapNames)
@@ -58,6 +60,31 @@ void AProjectERNPlayerController::BeginPlay()
 			if (Container)
 			{
 				Container->AddToViewport();
+			}
+		}
+	}
+
+	// 준비 완료 버튼 위젯 생성 (로컬 플레이어만)
+	if (IsLocalPlayerController() && ReadyButtonWidgetClass)
+	{
+		// 숨겨야 할 맵인지 확인
+		bool bShouldHide = false;
+		for (const FString& MapName : HideReadyButtonMapNames)
+		{
+			if (CurrentMapName.Contains(MapName))
+			{
+				bShouldHide = true;
+				break;
+			}
+		}
+
+		// 숨겨야 할 맵이 아니면 위젯 생성
+		if (!bShouldHide)
+		{
+			UUserWidget* ReadyButton = CreateWidget<UUserWidget>(this, ReadyButtonWidgetClass);
+			if (ReadyButton)
+			{
+				ReadyButton->AddToViewport();
 			}
 		}
 	}
@@ -134,6 +161,15 @@ void AProjectERNPlayerController::SetupInputComponent()
 				}
 			}
 		}
+
+		// Bind Ready Toggle Action
+		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
+		{
+			if (ReadyToggleAction)
+			{
+				EnhancedInputComponent->BindAction(ReadyToggleAction, ETriggerEvent::Started, this, &AProjectERNPlayerController::ToggleReady);
+			}
+		}
 	}
 }
 
@@ -141,5 +177,19 @@ bool AProjectERNPlayerController::ShouldUseTouchControls() const
 {
 	// are we on a mobile platform? Should we force touch?
 	return SVirtualJoystick::ShouldDisplayTouchInterface() || bForceTouchControls;
+}
+
+void AProjectERNPlayerController::ToggleReady()
+{
+	AProjectERNPlayerState* PS = GetPlayerState<AProjectERNPlayerState>();
+	if (PS)
+	{
+		// 현재 준비 상태를 토글해서 서버에 전송
+		PS->Server_SetReady(!PS->bIsReady);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ToggleReady called but PlayerState is null"));
+	}
 }
 

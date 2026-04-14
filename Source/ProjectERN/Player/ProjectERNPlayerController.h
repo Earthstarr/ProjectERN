@@ -7,6 +7,7 @@
 #include "ProjectERNPlayerController.generated.h"
 
 class UInputMappingContext;
+class UInputAction;
 class UUserWidget;
 class AProjectERNPlayerState;
 
@@ -30,6 +31,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input|Input Mappings")
 	TArray<UInputMappingContext*> MobileExcludedMappingContexts;
 
+	/** Ready toggle input action */
+	UPROPERTY(EditAnywhere, Category="Input|Actions")
+	UInputAction* ReadyToggleAction;
+
 	/** Mobile controls widget to spawn */
 	UPROPERTY(EditAnywhere, Category="Input|Touch Controls")
 	TSubclassOf<UUserWidget> MobileControlsWidgetClass;
@@ -50,6 +55,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TArray<FString> HidePartyWidgetMapNames;
 
+	// 준비 완료 버튼 위젯
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> ReadyButtonWidgetClass;
+
+	// 준비 완료 버튼을 숨길 맵 이름 목록 (부분 일치)
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TArray<FString> HideReadyButtonMapNames;
+
 	/** Gameplay initialization */
 	virtual void BeginPlay() override;
 
@@ -64,5 +77,10 @@ protected:
 
 	/** Returns true if the player should use UMG touch controls */
 	bool ShouldUseTouchControls() const;
+
+public:
+	// 준비 상태 토글 (블루프린트에서 호출)
+	UFUNCTION(BlueprintCallable, Category = "Game")
+	void ToggleReady();
 
 };
