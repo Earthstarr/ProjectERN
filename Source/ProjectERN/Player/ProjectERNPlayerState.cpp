@@ -9,6 +9,8 @@ AProjectERNPlayerState::AProjectERNPlayerState()
 {
 	// 기본값 - Character의 PossessedBy에서 설정됨
 	CharacterType = ECharacterType::Warrior;
+	PlayerNickname = TEXT("Player");
+	bIsReady = false;
 }
 
 // Replication 명단
@@ -17,6 +19,32 @@ void AProjectERNPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AProjectERNPlayerState, CharacterType);
+	DOREPLIFETIME(AProjectERNPlayerState, PlayerNickname);
+	DOREPLIFETIME(AProjectERNPlayerState, bIsReady);
+}
+
+void AProjectERNPlayerState::SetNickname(const FString& Nickname)
+{
+	Server_SetNickname(Nickname);
+}
+
+void AProjectERNPlayerState::Server_SetNickname_Implementation(const FString& Nickname)
+{
+	if (!Nickname.IsEmpty() && Nickname.Len() <= 20)
+	{
+		PlayerNickname = Nickname;
+		UE_LOG(LogTemp, Log, TEXT("Player nickname set to: %s"), *PlayerNickname);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Invalid nickname: %s"), *Nickname);
+	}
+}
+
+void AProjectERNPlayerState::Server_SetReady_Implementation(bool bReady)
+{
+	bIsReady = bReady;
+	UE_LOG(LogTemp, Log, TEXT("Player %s ready state: %s"), *PlayerNickname, bIsReady ? TEXT("Ready") : TEXT("Not Ready"));
 }
 
 // AttributeSet에서 값 가져오기
