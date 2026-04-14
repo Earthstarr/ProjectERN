@@ -14,6 +14,9 @@ enum class ECharacterType : uint8
 	Mage
 };
 
+// 준비 상태 변경 델리게이트
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnReadyStateChanged, bool, bIsReady);
+
 UCLASS()
 class PROJECTERN_API AProjectERNPlayerState : public APlayerState
 {
@@ -33,12 +36,23 @@ public:
 	FString PlayerNickname;
 
 	// 준비 상태 (로비용)
-	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Player Info")
+	UPROPERTY(ReplicatedUsing=OnRep_IsReady, BlueprintReadOnly, Category = "Player Info")
 	bool bIsReady;
+
+	// 준비 상태 변경 이벤트 (블루프린트에서 바인딩 가능)
+	UPROPERTY(BlueprintAssignable, Category = "Player Info")
+	FOnReadyStateChanged OnReadyStateChanged;
 
 	// 블루프린트에서 닉네임 설정 (자동으로 서버 RPC 호출)
 	UFUNCTION(BlueprintCallable, Category = "Player Info")
 	void SetNickname(const FString& Nickname);
+
+protected:
+	// bIsReady 리플리케이션 콜백
+	UFUNCTION()
+	void OnRep_IsReady();
+
+public:
 
 	// 서버에 닉네임 설정 요청
 	UFUNCTION(Server, Reliable)
