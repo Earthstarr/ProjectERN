@@ -60,6 +60,9 @@ void AERNGameState::CheckAllPlayersReady()
 	{
 		UE_LOG(LogTemp, Log, TEXT("All players ready! Traveling to field map: %s"), *FieldMapName);
 
+		// 방송
+		OnAllPlayersReady.Broadcast();
+
 		if (UWorld* World = GetWorld())
 		{
 			World->ServerTravel(FieldMapName + TEXT("?listen"));

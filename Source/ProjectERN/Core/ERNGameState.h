@@ -9,6 +9,9 @@
 // 플레이어 배열 변경 시 호출되는 델리게이트
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerArrayChanged);
 
+// 모든 플레이어 준비 완료 시 호출되는 델리게이트
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllPlayersReady);
+
 UCLASS()
 class PROJECTERN_API AERNGameState : public AGameStateBase
 {
@@ -20,6 +23,10 @@ public:
 	// 플레이어 배열 변경 이벤트
 	UPROPERTY(BlueprintAssignable, Category = "GameState")
 	FOnPlayerArrayChanged OnPlayerArrayChanged;
+
+	// 모든 플레이어 준비 완료 이벤트
+	UPROPERTY(BlueprintAssignable, Category = "GameState")
+	FOnAllPlayersReady OnAllPlayersReady;
 
 	// 모든 플레이어 준비 상태 확인 (서버에서만 호출)
 	void CheckAllPlayersReady();

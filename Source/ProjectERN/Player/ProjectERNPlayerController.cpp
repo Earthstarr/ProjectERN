@@ -96,6 +96,20 @@ void AProjectERNPlayerController::BeginPlay()
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AProjectERNPlayerController::TrySendNickname, 0.1f, false);
 	}
+	
+	// TODO : 검증 필요
+	// 로비 맵 진입 시 준비 상태 초기화
+	if (CurrentMapName.Contains(TEXT("Lobby")))
+	{
+		if (AProjectERNPlayerState* PS = GetPlayerState<AProjectERNPlayerState>())
+		{
+			if (PS->bIsReady)
+			{
+				PS->Server_SetReady(false);
+				UE_LOG(LogTemp, Log, TEXT("Reset ready state on lobby entry"));
+			}
+		}
+	}
 }
 
 void AProjectERNPlayerController::TrySendNickname()
