@@ -5,11 +5,14 @@
 #include "Character/Player/ProjectERNCharacter.h"
 #include "Core/ERNAttributeSet.h"
 #include "Core/ERNGameState.h"
+#include "GameFramework/PlayerController.h"
+#include "Core/Inventory/ERNEquipmentComponent.h"
+#include "Core/ERNGameInstance.h"
 
 AProjectERNPlayerState::AProjectERNPlayerState()
 {
-	// 기본값 - Character의 PossessedBy에서 설정됨
-	CharacterType = ECharacterType::Warrior;
+	// 기본값 - 로비에서 설정됨
+	CharacterType = ECharacterType::None;
 	PlayerNickname = TEXT("Player");
 	bIsReady = false;
 }
@@ -62,6 +65,80 @@ void AProjectERNPlayerState::OnRep_IsReady()
 	// 준비 상태가 리플리케이트되면 델리게이트 브로드캐스트
 	UE_LOG(LogTemp, Log, TEXT("OnRep_IsReady: Player %s is now %s"), *PlayerNickname, bIsReady ? TEXT("Ready") : TEXT("Not Ready"));
 	OnReadyStateChanged.Broadcast(bIsReady);
+}
+
+void AProjectERNPlayerState::Server_ChangeCharacterClass_Implementation(ECharacterType NewClass)
+{
+	APlayerController* PC = Cast<APlayerController>(GetOwner());
+	if (!PC)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Server_ChangeCharacterClass: PlayerController is null"));
+		return;
+	}
+
+	// 현재 캐릭터 정보 저장
+	APawn* OldPawn = PC->GetPawn();
+	FVector Location = OldPawn ? OldPawn->GetActorLocation() : FVector::ZeroVector;
+	FRotator Rotation = OldPawn ? OldPawn->GetActorRotation() : FRotator::ZeroRotator;
+
+	// 기존 캐릭터 파괴 (장착된 무기도 함께 정리)
+	if (OldPawn)
+	{
+		// Equipment 컴포넌트가 있다면 무기 먼저 해제
+		if (AProjectERNCharacter* OldCharacter = Cast<AProjectERNCharacter>(OldPawn))
+		{
+			if (UERNEquipmentComponent* EquipComp = OldCharacter->FindComponentByClass<UERNEquipmentComponent>())
+			{
+				// 장착된 무기가 있다면 먼저 해제
+				EquipComp->Server_UnequipWeapon();
+			}
+		}
+		OldPawn->Destroy();
+	}
+
+	// 새 캐릭터 클래스 선택
+	TSubclassOf<AProjectERNCharacter> NewCharacterClass = nullptr;
+	switch (NewClass)
+	{
+	case ECharacterType::Warrior:
+		NewCharacterClass = WarriorClass;
+		break;
+	case ECharacterType::Mage:
+		NewCharacterClass = MageClass;
+		break;
+	case ECharacterType::Support:
+		NewCharacterClass = SupporterClass;
+		break;
+	}
+
+	if (!NewCharacterClass)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Character class not set for type %d"), static_cast<int32>(NewClass));
+		return;
+	}
+
+	// 새 캐릭터 스폰
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = PC;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	if (AProjectERNCharacter* NewCharacter = GetWorld()->SpawnActor<AProjectERNCharacter>(
+		NewCharacterClass, Location, Rotation, SpawnParams))
+	{
+		// Possess
+		PC->Possess(NewCharacter);
+
+		// CharacterType 업데이트
+		CharacterType = NewClass;
+
+		UE_LOG(LogTemp, Warning, TEXT("[Server_ChangeCharacterClass] Player %s changed CharacterType to %d"), *PlayerNickname, static_cast<int32>(NewClass));
+	}
+}
+
+void AProjectERNPlayerState::Server_SetCharacterType_Implementation(ECharacterType NewType)
+{
+	CharacterType = NewType;
+	UE_LOG(LogTemp, Log, TEXT("[Server_SetCharacterType] Player %s CharacterType set to %d"), *PlayerNickname, static_cast<int32>(NewType));
 }
 
 // AttributeSet에서 값 가져오기

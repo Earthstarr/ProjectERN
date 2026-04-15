@@ -9,6 +9,7 @@
 UENUM(BlueprintType)
 enum class ECharacterType : uint8
 {
+	None,
 	Warrior,
 	Support,
 	Mage
@@ -61,6 +62,24 @@ public:
 	// 서버에 준비 상태 설정 요청
 	UFUNCTION(Server, Reliable)
 	void Server_SetReady(bool bReady);
+
+	// 서버에 캐릭터 클래스 변경 요청
+	UFUNCTION(Server, Reliable)
+	void Server_ChangeCharacterClass(ECharacterType NewClass);
+
+	// 서버에 캐릭터 타입 설정 요청 (맵 이동 시 복원용)
+	UFUNCTION(Server, Reliable)
+	void Server_SetCharacterType(ECharacterType NewType);
+
+	// 각 클래스별 캐릭터 블루프린트
+	UPROPERTY(EditDefaultsOnly, Category = "Character")
+	TSubclassOf<class AProjectERNCharacter> WarriorClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Character")
+	TSubclassOf<class AProjectERNCharacter> MageClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Character")
+	TSubclassOf<class AProjectERNCharacter> SupporterClass;
 
 	// AttributeSet에서 HP/MP/Stamina 가져오기 (블루프린트용 헬퍼)
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Attributes")

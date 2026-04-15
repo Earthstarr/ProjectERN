@@ -15,7 +15,10 @@ class AProjectERNGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-	
+
 	/** Constructor */
 	AProjectERNGameMode();
+
+	// 플레이어의 CharacterType에 따라 적절한 Pawn 클래스 반환
+	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
 };

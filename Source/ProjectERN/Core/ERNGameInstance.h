@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "Player/ProjectERNPlayerState.h"
 #include "ERNGameInstance.generated.h"
 
 UCLASS()
@@ -52,6 +53,18 @@ public:
 	// 현재 플레이어 닉네임
 	UPROPERTY(BlueprintReadWrite, Category = "Network")
 	FString CurrentPlayerNickname;
+
+	// 현재 플레이어 캐릭터 타입 설정
+	UFUNCTION(BlueprintCallable, Category = "Network")
+	void SetPlayerCharacterType(ECharacterType CharacterType) { CurrentCharacterType = CharacterType; }
+
+	// 현재 플레이어 캐릭터 타입 가져오기
+	UFUNCTION(BlueprintPure, Category = "Network")
+	ECharacterType GetPlayerCharacterType() const { return CurrentCharacterType; }
+
+	// 현재 플레이어 캐릭터 타입
+	UPROPERTY(BlueprintReadWrite, Category = "Network")
+	ECharacterType CurrentCharacterType;
 
 protected:
 	// 세션 인터페이스
