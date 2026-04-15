@@ -80,8 +80,17 @@ void AProjectERNCharacter::PossessedBy(AController* NewController)
 	// 서버에서만 실행됨
 	if (AProjectERNPlayerState* PS = GetPlayerState<AProjectERNPlayerState>())
 	{
-		// 캐릭터의 타입을 PlayerState에 설정
-		PS->CharacterType = CharacterType;
+		// PlayerState의 CharacterType을 캐릭터에 적용 (맵 이동 시 유지)
+		// PlayerState가 None이 아니면 그대로 사용, None이면 캐릭터 기본값 사용
+		if (PS->CharacterType != ECharacterType::None)
+		{
+			CharacterType = PS->CharacterType;
+		}
+		else
+		{
+			// PlayerState가 None이면 캐릭터의 기본값을 PlayerState에 설정
+			PS->CharacterType = CharacterType;
+		}
 	}
 
 	// GAS 초기화는 부모 클래스에서 처리

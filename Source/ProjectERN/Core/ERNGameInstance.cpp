@@ -9,6 +9,7 @@
 UERNGameInstance::UERNGameInstance()
 {
 	PendingMaxPlayers = 3;
+	CurrentCharacterType = ECharacterType::None;
 }
 
 void UERNGameInstance::Init()

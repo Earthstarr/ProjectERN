@@ -35,6 +35,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input|Actions")
 	UInputAction* ReadyToggleAction;
 
+	/** Interact input action */
+	UPROPERTY(EditAnywhere, Category="Input|Actions")
+	UInputAction* InteractAction;
+
 	/** Mobile controls widget to spawn */
 	UPROPERTY(EditAnywhere, Category="Input|Touch Controls")
 	TSubclassOf<UUserWidget> MobileControlsWidgetClass;
@@ -72,6 +76,9 @@ protected:
 	// 닉네임 전송 재시도 (PlayerState가 준비될 때까지)
 	void TrySendNickname();
 
+	// 캐릭터 타입 확인 및 수정 (맵 이동 후)
+	void CheckAndFixCharacterType();
+
 	/** Input mapping context setup */
 	virtual void SetupInputComponent() override;
 
@@ -79,8 +86,30 @@ protected:
 	bool ShouldUseTouchControls() const;
 
 public:
+	// 캐릭터 선택 위젯
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> CharacterSelectionWidgetClass;
+
 	// 준비 상태 토글 (블루프린트에서 호출)
 	UFUNCTION(BlueprintCallable, Category = "Game")
 	void ToggleReady();
 
+	// 상호작용 시도
+	UFUNCTION(BlueprintCallable, Category = "Interaction")
+	void TryInteract();
+
+	// Pedestal(상호작용가능한액터)에서 호출용
+	void SetCurrentInteractable(AActor* Interactable) { CurrentInteractableActor = Interactable; }
+	void ClearCurrentInteractable() { CurrentInteractableActor = nullptr; }
+
+private:
+	// 현재 상호작용 가능한 액터
+	UPROPERTY()
+	TWeakObjectPtr<AActor> CurrentInteractableActor;
+
+	// 캐릭터 타입 체크 타이머
+	FTimerHandle CharacterTypeCheckTimerHandle;
+
+	// 캐릭터 타입 체크 시작 시간
+	float CharacterTypeCheckStartTime;
 };

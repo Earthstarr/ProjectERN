@@ -13,6 +13,7 @@
 #include "Player/ProjectERNPlayerState.h"
 #include "GameFramework/GameStateBase.h"
 #include "Core/ERNGameInstance.h"
+#include "Interfaces/IInteractable.h"
 
 void AProjectERNPlayerController::BeginPlay()
 {
@@ -95,6 +96,12 @@ void AProjectERNPlayerController::BeginPlay()
 		// 0.1초 후에 시도 (PlayerState가 준비될 시간 확보)
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AProjectERNPlayerController::TrySendNickname, 0.1f, false);
+
+		// 캐릭터 타입 체크 시작 시간 기록
+		CharacterTypeCheckStartTime = GetWorld()->GetTimeSeconds();
+
+		// 0.3초마다 반복 체크 (최대 10초 동안)
+		GetWorld()->GetTimerManager().SetTimer(CharacterTypeCheckTimerHandle, this, &AProjectERNPlayerController::CheckAndFixCharacterType, 0.3f, true);
 	}
 	
 	// TODO : 검증 필요
@@ -122,15 +129,27 @@ void AProjectERNPlayerController::TrySendNickname()
 	UERNGameInstance* GI = Cast<UERNGameInstance>(GetGameInstance());
 	AProjectERNPlayerState* PS = GetPlayerState<AProjectERNPlayerState>();
 
-	UE_LOG(LogTemp, Warning, TEXT("[DEBUG] GI valid: %s, PS valid: %s, Nickname: %s"),
+	UE_LOG(LogTemp, Warning, TEXT("[DEBUG] GI valid: %s, PS valid: %s, Nickname: %s, CharacterType: %d"),
 		GI ? TEXT("YES") : TEXT("NO"),
 		PS ? TEXT("YES") : TEXT("NO"),
-		GI ? *GI->CurrentPlayerNickname : TEXT("GI is null"));
+		GI ? *GI->CurrentPlayerNickname : TEXT("GI is null"),
+		GI ? static_cast<int32>(GI->GetPlayerCharacterType()) : -1);
 
-	if (GI && PS && !GI->CurrentPlayerNickname.IsEmpty())
+	if (GI && PS)
 	{
-		PS->Server_SetNickname(GI->CurrentPlayerNickname);
-		UE_LOG(LogTemp, Log, TEXT("Sending nickname to server: %s"), *GI->CurrentPlayerNickname);
+		// 닉네임 전송
+		if (!GI->CurrentPlayerNickname.IsEmpty())
+		{
+			PS->Server_SetNickname(GI->CurrentPlayerNickname);
+			UE_LOG(LogTemp, Log, TEXT("Sending nickname to server: %s"), *GI->CurrentPlayerNickname);
+		}
+
+		// CharacterType 복원 (None이 아닌 경우에만)
+		if (GI->GetPlayerCharacterType() != ECharacterType::None)
+		{
+			PS->Server_SetCharacterType(GI->GetPlayerCharacterType());
+			UE_LOG(LogTemp, Log, TEXT("Requesting CharacterType restoration to server: %d"), static_cast<int32>(GI->GetPlayerCharacterType()));
+		}
 	}
 	else if (GI && !GI->CurrentPlayerNickname.IsEmpty())
 	{
@@ -176,12 +195,17 @@ void AProjectERNPlayerController::SetupInputComponent()
 			}
 		}
 
-		// Bind Ready Toggle Action
+		// Bind Input Actions
 		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 		{
 			if (ReadyToggleAction)
 			{
 				EnhancedInputComponent->BindAction(ReadyToggleAction, ETriggerEvent::Started, this, &AProjectERNPlayerController::ToggleReady);
+			}
+
+			if (InteractAction)
+			{
+				EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AProjectERNPlayerController::TryInteract);
 			}
 		}
 	}
@@ -204,6 +228,77 @@ void AProjectERNPlayerController::ToggleReady()
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ToggleReady called but PlayerState is null"));
+	}
+}
+
+void AProjectERNPlayerController::CheckAndFixCharacterType()
+{
+	if (!IsLocalPlayerController())
+	{
+		return;
+	}
+
+	// 10초 경과 체크
+	float ElapsedTime = GetWorld()->GetTimeSeconds() - CharacterTypeCheckStartTime;
+	if (ElapsedTime > 10.0f)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[CheckAndFixCharacterType] Timeout (10 seconds). Stopping check."));
+		GetWorld()->GetTimerManager().ClearTimer(CharacterTypeCheckTimerHandle);
+		return;
+	}
+
+	UERNGameInstance* GI = GetGameInstance<UERNGameInstance>();
+	AProjectERNPlayerState* PS = GetPlayerState<AProjectERNPlayerState>();
+
+	if (!GI || !PS)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[CheckAndFixCharacterType] GI or PS is null. GI: %s, PS: %s. Retrying..."),
+			GI ? TEXT("Valid") : TEXT("NULL"), PS ? TEXT("Valid") : TEXT("NULL"));
+		return; // 타이머가 계속 돌면서 재시도
+	}
+
+	ECharacterType SavedType = GI->GetPlayerCharacterType();
+
+	UE_LOG(LogTemp, Warning, TEXT("[CheckAndFixCharacterType] SavedType in GI: %d, Current PS CharacterType: %d"),
+		static_cast<int32>(SavedType), static_cast<int32>(PS->CharacterType));
+
+	// GameInstance에 저장된 타입이 있고, PlayerState와 다르면 재스폰
+	if (SavedType != ECharacterType::None && SavedType != PS->CharacterType)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[CheckAndFixCharacterType] Character type mismatch! Requesting change from %d to %d"),
+			static_cast<int32>(PS->CharacterType), static_cast<int32>(SavedType));
+
+		PS->Server_ChangeCharacterClass(SavedType);
+
+		// 재스폰 요청 후 타이머 정지
+		GetWorld()->GetTimerManager().ClearTimer(CharacterTypeCheckTimerHandle);
+		UE_LOG(LogTemp, Log, TEXT("[CheckAndFixCharacterType] Character respawn requested. Stopping check."));
+	}
+	else if (SavedType != ECharacterType::None && SavedType == PS->CharacterType)
+	{
+		// 타입이 일치하면 성공 - 타이머 정지
+		UE_LOG(LogTemp, Log, TEXT("[CheckAndFixCharacterType] Character type is correct: %d. Stopping check."), static_cast<int32>(PS->CharacterType));
+		GetWorld()->GetTimerManager().ClearTimer(CharacterTypeCheckTimerHandle);
+	}
+	else
+	{
+		// SavedType이 None인 경우 - 로비에서 선택 안 한 경우
+		UE_LOG(LogTemp, Log, TEXT("[CheckAndFixCharacterType] No saved character type. Using default."));
+	}
+}
+
+void AProjectERNPlayerController::TryInteract()
+{
+	UE_LOG(LogTemp, Warning, TEXT("TryInteract"));
+	if (CurrentInteractableActor.IsValid())
+	{
+		if (IInteractable* Interactable = Cast<IInteractable>(CurrentInteractableActor.Get()))
+		{
+			if (Interactable->Execute_CanInteract(CurrentInteractableActor.Get()))
+			{
+				Interactable->Execute_Interact(CurrentInteractableActor.Get(), this);
+			}
+		}
 	}
 }
 
