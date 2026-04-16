@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "Player/ProjectERNPlayerState.h"
+#include "Player/ERNPlayerState.h"
 #include "Net/UnrealNetwork.h"
 #include "Character/Player/ProjectERNCharacter.h"
 #include "Core/ERNAttributeSet.h"
@@ -9,7 +9,7 @@
 #include "Core/Inventory/ERNEquipmentComponent.h"
 #include "Core/ERNGameInstance.h"
 
-AProjectERNPlayerState::AProjectERNPlayerState()
+AERNPlayerState::AERNPlayerState()
 {
 	// 기본값 - 로비에서 설정됨
 	CharacterType = ECharacterType::None;
@@ -18,21 +18,21 @@ AProjectERNPlayerState::AProjectERNPlayerState()
 }
 
 // Replication 명단
-void AProjectERNPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void AERNPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(AProjectERNPlayerState, CharacterType);
-	DOREPLIFETIME(AProjectERNPlayerState, PlayerNickname);
-	DOREPLIFETIME(AProjectERNPlayerState, bIsReady);
+	DOREPLIFETIME(AERNPlayerState, CharacterType);
+	DOREPLIFETIME(AERNPlayerState, PlayerNickname);
+	DOREPLIFETIME(AERNPlayerState, bIsReady);
 }
 
-void AProjectERNPlayerState::SetNickname(const FString& Nickname)
+void AERNPlayerState::SetNickname(const FString& Nickname)
 {
 	Server_SetNickname(Nickname);
 }
 
-void AProjectERNPlayerState::Server_SetNickname_Implementation(const FString& Nickname)
+void AERNPlayerState::Server_SetNickname_Implementation(const FString& Nickname)
 {
 	if (!Nickname.IsEmpty() && Nickname.Len() <= 20)
 	{
@@ -45,7 +45,7 @@ void AProjectERNPlayerState::Server_SetNickname_Implementation(const FString& Ni
 	}
 }
 
-void AProjectERNPlayerState::Server_SetReady_Implementation(bool bReady)
+void AERNPlayerState::Server_SetReady_Implementation(bool bReady)
 {
 	bIsReady = bReady;
 	UE_LOG(LogTemp, Log, TEXT("Player %s ready state: %s"), *PlayerNickname, bIsReady ? TEXT("Ready") : TEXT("Not Ready"));
@@ -60,14 +60,14 @@ void AProjectERNPlayerState::Server_SetReady_Implementation(bool bReady)
 	}
 }
 
-void AProjectERNPlayerState::OnRep_IsReady()
+void AERNPlayerState::OnRep_IsReady()
 {
 	// 준비 상태가 리플리케이트되면 델리게이트 브로드캐스트
 	UE_LOG(LogTemp, Log, TEXT("OnRep_IsReady: Player %s is now %s"), *PlayerNickname, bIsReady ? TEXT("Ready") : TEXT("Not Ready"));
 	OnReadyStateChanged.Broadcast(bIsReady);
 }
 
-void AProjectERNPlayerState::Server_ChangeCharacterClass_Implementation(ECharacterType NewClass)
+void AERNPlayerState::Server_ChangeCharacterClass_Implementation(ECharacterType NewClass)
 {
 	APlayerController* PC = Cast<APlayerController>(GetOwner());
 	if (!PC)
@@ -135,14 +135,14 @@ void AProjectERNPlayerState::Server_ChangeCharacterClass_Implementation(ECharact
 	}
 }
 
-void AProjectERNPlayerState::Server_SetCharacterType_Implementation(ECharacterType NewType)
+void AERNPlayerState::Server_SetCharacterType_Implementation(ECharacterType NewType)
 {
 	CharacterType = NewType;
 	UE_LOG(LogTemp, Log, TEXT("[Server_SetCharacterType] Player %s CharacterType set to %d"), *PlayerNickname, static_cast<int32>(NewType));
 }
 
 // AttributeSet에서 값 가져오기
-float AProjectERNPlayerState::GetCurrentHealth() const
+float AERNPlayerState::GetCurrentHealth() const
 {
 	if (APawn* Pawn = GetPawn())
 	{
@@ -157,7 +157,7 @@ float AProjectERNPlayerState::GetCurrentHealth() const
 	return 0.f;
 }
 
-float AProjectERNPlayerState::GetMaxHealth() const
+float AERNPlayerState::GetMaxHealth() const
 {
 	if (APawn* Pawn = GetPawn())
 	{
@@ -172,7 +172,7 @@ float AProjectERNPlayerState::GetMaxHealth() const
 	return 100.f;
 }
 
-float AProjectERNPlayerState::GetCurrentMana() const
+float AERNPlayerState::GetCurrentMana() const
 {
 	if (APawn* Pawn = GetPawn())
 	{
@@ -187,7 +187,7 @@ float AProjectERNPlayerState::GetCurrentMana() const
 	return 0.f;
 }
 
-float AProjectERNPlayerState::GetMaxMana() const
+float AERNPlayerState::GetMaxMana() const
 {
 	if (APawn* Pawn = GetPawn())
 	{
@@ -202,7 +202,7 @@ float AProjectERNPlayerState::GetMaxMana() const
 	return 100.f;
 }
 
-float AProjectERNPlayerState::GetCurrentStamina() const
+float AERNPlayerState::GetCurrentStamina() const
 {
 	if (APawn* Pawn = GetPawn())
 	{
@@ -217,7 +217,7 @@ float AProjectERNPlayerState::GetCurrentStamina() const
 	return 0.f;
 }
 
-float AProjectERNPlayerState::GetMaxStamina() const
+float AERNPlayerState::GetMaxStamina() const
 {
 	if (APawn* Pawn = GetPawn())
 	{

@@ -1,21 +1,21 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "Core/ProjectERNGameMode.h"
-#include "Player/ProjectERNPlayerState.h"
+#include "Core/ERNGameMode.h"
+#include "Player/ERNPlayerState.h"
 #include "Character/Player/ProjectERNCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "Core/ERNGameInstance.h"
 
-AProjectERNGameMode::AProjectERNGameMode()
+AERNGameMode::AERNGameMode()
 {
 }
 
-UClass* AProjectERNGameMode::GetDefaultPawnClassForController_Implementation(AController* InController)
+UClass* AERNGameMode::GetDefaultPawnClassForController_Implementation(AController* InController)
 {
 	// PlayerController에서 PlayerState 가져오기
 	if (APlayerController* PC = Cast<APlayerController>(InController))
 	{
-		if (AProjectERNPlayerState* PS = PC->GetPlayerState<AProjectERNPlayerState>())
+		if (AERNPlayerState* PS = PC->GetPlayerState<AERNPlayerState>())
 		{
 			// PlayerState의 CharacterType이 None인 경우, GameInstance에서 복원 시도
 			if (PS->CharacterType == ECharacterType::None)

@@ -4,7 +4,7 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "GameFramework/PlayerController.h"
-#include "Player/ProjectERNPlayerState.h"
+#include "Player/ERNPlayerState.h"
 
 void UMyStatusWidget::NativeConstruct()
 {
@@ -13,7 +13,7 @@ void UMyStatusWidget::NativeConstruct()
 	// PlayerState 캐시
 	if (APlayerController* PC = GetOwningPlayer())
 	{
-		CachedPlayerState = PC->GetPlayerState<AProjectERNPlayerState>();
+		CachedPlayerState = PC->GetPlayerState<AERNPlayerState>();
 	}
 }
 

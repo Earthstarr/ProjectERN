@@ -4,20 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "ProjectERNGameMode.generated.h"
+#include "ERNGameMode.generated.h"
 
 /**
  *  Simple GameMode for a third person game
  */
 UCLASS(abstract)
-class AProjectERNGameMode : public AGameModeBase
+class AERNGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
 
 	/** Constructor */
-	AProjectERNGameMode();
+	AERNGameMode();
 
 	// 플레이어의 CharacterType에 따라 적절한 Pawn 클래스 반환
 	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;

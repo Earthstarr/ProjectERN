@@ -8,7 +8,7 @@
 
 class UProgressBar;
 class UTextBlock;
-class AProjectERNPlayerState;
+class AERNPlayerState;
 
 UCLASS()
 class PROJECTERN_API UMyStatusWidget : public UUserWidget
@@ -41,7 +41,7 @@ protected:
 
 	// 캐시된 PlayerState
 	UPROPERTY()
-	AProjectERNPlayerState* CachedPlayerState;
+	AERNPlayerState* CachedPlayerState;
 
 	void UpdateHealth();
 	void UpdateMana();

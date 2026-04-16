@@ -12,7 +12,7 @@
 #include "InputActionValue.h"
 #include "ProjectERN.h"
 #include "AbilitySystemComponent.h"
-#include "Player/ProjectERNPlayerState.h"
+#include "Player/ERNPlayerState.h"
 #include "Core/Inventory/ERNInventoryComponent.h"
 #include "Core/Inventory/ERNEquipmentComponent.h"
 #include "Core/ERNGameplayTags.h"
@@ -78,7 +78,7 @@ void AProjectERNCharacter::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 
 	// 서버에서만 실행됨
-	if (AProjectERNPlayerState* PS = GetPlayerState<AProjectERNPlayerState>())
+	if (AERNPlayerState* PS = GetPlayerState<AERNPlayerState>())
 	{
 		// PlayerState의 CharacterType을 캐릭터에 적용 (맵 이동 시 유지)
 		// PlayerState가 None이 아니면 그대로 사용, None이면 캐릭터 기본값 사용

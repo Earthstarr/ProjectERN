@@ -2,7 +2,7 @@
 
 #include "Core/ERNGameState.h"
 #include "GameFramework/PlayerState.h"
-#include "Player/ProjectERNPlayerState.h"
+#include "Player/ERNPlayerState.h"
 
 AERNGameState::AERNGameState()
 {
@@ -44,7 +44,7 @@ void AERNGameState::CheckAllPlayersReady()
 	bool bAllReady = true;
 	for (APlayerState* PS : PlayerArray)
 	{
-		if (AProjectERNPlayerState* ERNPlayerState = Cast<AProjectERNPlayerState>(PS))
+		if (AERNPlayerState* ERNPlayerState = Cast<AERNPlayerState>(PS))
 		{
 			if (!ERNPlayerState->bIsReady)
 			{

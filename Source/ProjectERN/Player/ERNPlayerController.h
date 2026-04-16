@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "ProjectERNPlayerController.generated.h"
+#include "ERNPlayerController.generated.h"
 
 class UInputMappingContext;
 class UInputAction;
 class UUserWidget;
-class AProjectERNPlayerState;
+class AERNPlayerState;
 
 /**
  *  Basic PlayerController class for a third person game
@@ -17,7 +17,7 @@ class AProjectERNPlayerState;
  */
 
 UCLASS(abstract)
-class AProjectERNPlayerController : public APlayerController
+class AERNPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
