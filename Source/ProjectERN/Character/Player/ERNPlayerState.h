@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
-#include "ProjectERNPlayerState.generated.h"
+#include "ERNPlayerState.generated.h"
 
 UENUM(BlueprintType)
 enum class ECharacterType : uint8
@@ -19,12 +19,12 @@ enum class ECharacterType : uint8
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnReadyStateChanged, bool, bIsReady);
 
 UCLASS()
-class PROJECTERN_API AProjectERNPlayerState : public APlayerState
+class PROJECTERN_API AERNPlayerState : public APlayerState
 {
 	GENERATED_BODY()
 
 public:
-	AProjectERNPlayerState();
+	AERNPlayerState();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

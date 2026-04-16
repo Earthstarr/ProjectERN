@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "Core/Inventory/ERNEquipmentComponent.h"
-#include "Core/Inventory/ERNWeaponBase.h"
+#include "Inventory/Components/ERNEquipmentComponent.h"
+#include "Combat/Weapons/ERNWeaponBase.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/Character.h"
 #include "Components/SkeletalMeshComponent.h"

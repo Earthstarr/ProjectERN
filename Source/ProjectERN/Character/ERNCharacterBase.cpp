@@ -2,7 +2,7 @@
 
 #include "Character/ERNCharacterBase.h"
 #include "AbilitySystemComponent.h"
-#include "Core/ERNAttributeSet.h"
+#include "GAS/ERNAttributeSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Abilities/GameplayAbility.h"

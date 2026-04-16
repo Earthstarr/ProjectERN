@@ -2,7 +2,7 @@
 
 #include "UI/ERNEnemyHealthBarWidget.h"
 #include "Character/Enemy/ERNEnemyCharacter.h"
-#include "Core/ERNAttributeSet.h"
+#include "GAS/ERNAttributeSet.h"
 #include "Components/ProgressBar.h"
 
 void UERNEnemyHealthBarWidget::InitWidget(AERNEnemyCharacter* OwnerCharacter)

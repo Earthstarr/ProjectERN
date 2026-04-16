@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Core/Inventory/ERNWeaponBase.h"
+#include "Combat/Weapons/ERNWeaponBase.h"
 #include "ERNRangedWeapon.generated.h"
 
 class AERNProjectileBase;

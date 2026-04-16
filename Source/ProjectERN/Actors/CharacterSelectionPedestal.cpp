@@ -6,7 +6,7 @@
 #include "Components/WidgetComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/PlayerController.h"
-#include "Player/ProjectERNPlayerController.h"
+#include "Character/Player/ERNPlayerController.h"
 
 ACharacterSelectionPedestal::ACharacterSelectionPedestal()
 {
@@ -47,7 +47,7 @@ void ACharacterSelectionPedestal::Interact_Implementation(APlayerController* Pla
 	}
 
 	// PlayerController의 위젯 클래스 사용
-	AProjectERNPlayerController* ERNPlayerController = Cast<AProjectERNPlayerController>(PlayerController);
+	AERNPlayerController* ERNPlayerController = Cast<AERNPlayerController>(PlayerController);
 	if (!ERNPlayerController || !ERNPlayerController->CharacterSelectionWidgetClass)
 	{
 		return;
@@ -81,7 +81,7 @@ void ACharacterSelectionPedestal::OnSphereBeginOverlap(UPrimitiveComponent* Over
 	// 플레이어가 범위 안에 들어오면 상호작용 UI 표시
 	if (APawn* Pawn = Cast<APawn>(OtherActor))
 	{
-		if (AProjectERNPlayerController* PC = Cast<AProjectERNPlayerController>(Pawn->GetController()))
+		if (AERNPlayerController* PC = Cast<AERNPlayerController>(Pawn->GetController()))
 		{
 			PC->SetCurrentInteractable(this);
 
@@ -100,7 +100,7 @@ void ACharacterSelectionPedestal::OnSphereEndOverlap(UPrimitiveComponent* Overla
 	// 플레이어가 범위 밖으로 나가면 상호작용 UI 숨김
 	if (APawn* Pawn = Cast<APawn>(OtherActor))
 	{
-		if (AProjectERNPlayerController* PC = Cast<AProjectERNPlayerController>(Pawn->GetController()))
+		if (AERNPlayerController* PC = Cast<AERNPlayerController>(Pawn->GetController()))
 		{
 			PC->ClearCurrentInteractable();
 

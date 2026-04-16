@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Player/ProjectERNPlayerState.h"
+#include "Character/Player/ERNPlayerState.h"
 #include "CharacterSelectionWidget.generated.h"
 
 /**

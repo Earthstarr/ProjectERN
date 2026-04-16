@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "Abilities/ERNGA_AttackAbility.h"
-#include "Core/ERNGameplayTags.h"
+#include "GAS/Abilities/ERNGA_AttackAbility.h"
+#include "GAS/ERNGameplayTags.h"
 
 UERNA_AttackAbility::UERNA_AttackAbility()
 {

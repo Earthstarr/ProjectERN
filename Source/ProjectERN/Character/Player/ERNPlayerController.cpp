@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 
-#include "Player/ProjectERNPlayerController.h"
+#include "Character/Player/ERNPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Engine/LocalPlayer.h"
@@ -10,12 +10,12 @@
 #include "Blueprint/UserWidget.h"
 #include "ProjectERN.h"
 #include "Widgets/Input/SVirtualJoystick.h"
-#include "Player/ProjectERNPlayerState.h"
+#include "Character/Player/ERNPlayerState.h"
 #include "GameFramework/GameStateBase.h"
 #include "Core/ERNGameInstance.h"
 #include "Interfaces/IInteractable.h"
 
-void AProjectERNPlayerController::BeginPlay()
+void AERNPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -95,20 +95,20 @@ void AProjectERNPlayerController::BeginPlay()
 	{
 		// 0.1초 후에 시도 (PlayerState가 준비될 시간 확보)
 		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AProjectERNPlayerController::TrySendNickname, 0.1f, false);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AERNPlayerController::TrySendNickname, 0.1f, false);
 
 		// 캐릭터 타입 체크 시작 시간 기록
 		CharacterTypeCheckStartTime = GetWorld()->GetTimeSeconds();
 
 		// 0.3초마다 반복 체크 (최대 10초 동안)
-		GetWorld()->GetTimerManager().SetTimer(CharacterTypeCheckTimerHandle, this, &AProjectERNPlayerController::CheckAndFixCharacterType, 0.3f, true);
+		GetWorld()->GetTimerManager().SetTimer(CharacterTypeCheckTimerHandle, this, &AERNPlayerController::CheckAndFixCharacterType, 0.3f, true);
 	}
 	
 	// TODO : 검증 필요
 	// 로비 맵 진입 시 준비 상태 초기화
 	if (CurrentMapName.Contains(TEXT("Lobby")))
 	{
-		if (AProjectERNPlayerState* PS = GetPlayerState<AProjectERNPlayerState>())
+		if (AERNPlayerState* PS = GetPlayerState<AERNPlayerState>())
 		{
 			if (PS->bIsReady)
 			{
@@ -119,7 +119,7 @@ void AProjectERNPlayerController::BeginPlay()
 	}
 }
 
-void AProjectERNPlayerController::TrySendNickname()
+void AERNPlayerController::TrySendNickname()
 {
 	if (!IsLocalPlayerController())
 	{
@@ -127,7 +127,7 @@ void AProjectERNPlayerController::TrySendNickname()
 	}
 
 	UERNGameInstance* GI = Cast<UERNGameInstance>(GetGameInstance());
-	AProjectERNPlayerState* PS = GetPlayerState<AProjectERNPlayerState>();
+	AERNPlayerState* PS = GetPlayerState<AERNPlayerState>();
 
 	UE_LOG(LogTemp, Warning, TEXT("[DEBUG] GI valid: %s, PS valid: %s, Nickname: %s, CharacterType: %d"),
 		GI ? TEXT("YES") : TEXT("NO"),
@@ -160,7 +160,7 @@ void AProjectERNPlayerController::TrySendNickname()
 			RetryCount++;
 			UE_LOG(LogTemp, Warning, TEXT("PlayerState not ready, retrying... (Attempt %d/50)"), RetryCount);
 			FTimerHandle RetryTimer;
-			GetWorld()->GetTimerManager().SetTimer(RetryTimer, this, &AProjectERNPlayerController::TrySendNickname, 0.1f, false);
+			GetWorld()->GetTimerManager().SetTimer(RetryTimer, this, &AERNPlayerController::TrySendNickname, 0.1f, false);
 		}
 		else
 		{
@@ -170,7 +170,7 @@ void AProjectERNPlayerController::TrySendNickname()
 	}
 }
 
-void AProjectERNPlayerController::SetupInputComponent()
+void AERNPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
@@ -200,26 +200,26 @@ void AProjectERNPlayerController::SetupInputComponent()
 		{
 			if (ReadyToggleAction)
 			{
-				EnhancedInputComponent->BindAction(ReadyToggleAction, ETriggerEvent::Started, this, &AProjectERNPlayerController::ToggleReady);
+				EnhancedInputComponent->BindAction(ReadyToggleAction, ETriggerEvent::Started, this, &AERNPlayerController::ToggleReady);
 			}
 
 			if (InteractAction)
 			{
-				EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AProjectERNPlayerController::TryInteract);
+				EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AERNPlayerController::TryInteract);
 			}
 		}
 	}
 }
 
-bool AProjectERNPlayerController::ShouldUseTouchControls() const
+bool AERNPlayerController::ShouldUseTouchControls() const
 {
 	// are we on a mobile platform? Should we force touch?
 	return SVirtualJoystick::ShouldDisplayTouchInterface() || bForceTouchControls;
 }
 
-void AProjectERNPlayerController::ToggleReady()
+void AERNPlayerController::ToggleReady()
 {
-	AProjectERNPlayerState* PS = GetPlayerState<AProjectERNPlayerState>();
+	AERNPlayerState* PS = GetPlayerState<AERNPlayerState>();
 	if (PS)
 	{
 		// 현재 준비 상태를 토글해서 서버에 전송
@@ -231,7 +231,7 @@ void AProjectERNPlayerController::ToggleReady()
 	}
 }
 
-void AProjectERNPlayerController::CheckAndFixCharacterType()
+void AERNPlayerController::CheckAndFixCharacterType()
 {
 	if (!IsLocalPlayerController())
 	{
@@ -248,7 +248,7 @@ void AProjectERNPlayerController::CheckAndFixCharacterType()
 	}
 
 	UERNGameInstance* GI = GetGameInstance<UERNGameInstance>();
-	AProjectERNPlayerState* PS = GetPlayerState<AProjectERNPlayerState>();
+	AERNPlayerState* PS = GetPlayerState<AERNPlayerState>();
 
 	if (!GI || !PS)
 	{
@@ -287,7 +287,7 @@ void AProjectERNPlayerController::CheckAndFixCharacterType()
 	}
 }
 
-void AProjectERNPlayerController::TryInteract()
+void AERNPlayerController::TryInteract()
 {
 	UE_LOG(LogTemp, Warning, TEXT("TryInteract"));
 	if (CurrentInteractableActor.IsValid())

@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "Core/Inventory/ERNMeleeWeapon.h"
+#include "Combat/Weapons/ERNMeleeWeapon.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/Character.h"
 #include "NiagaraFunctionLibrary.h"
@@ -8,7 +8,7 @@
 #include "Character/Enemy/ERNEnemyCharacter.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
-#include "Core/ERNGameplayTags.h"
+#include "GAS/ERNGameplayTags.h"
 
 AERNMeleeWeapon::AERNMeleeWeapon()
 {
