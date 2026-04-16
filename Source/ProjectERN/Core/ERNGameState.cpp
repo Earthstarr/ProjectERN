@@ -2,7 +2,7 @@
 
 #include "Core/ERNGameState.h"
 #include "GameFramework/PlayerState.h"
-#include "Player/ERNPlayerState.h"
+#include "Character/Player/ERNPlayerState.h"
 
 AERNGameState::AERNGameState()
 {

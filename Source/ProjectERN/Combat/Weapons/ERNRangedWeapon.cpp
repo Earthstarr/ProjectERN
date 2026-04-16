@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "Core/Inventory/ERNRangedWeapon.h"
-#include "Core/Combat/ERNProjectileBase.h"
+#include "Combat/Weapons/ERNRangedWeapon.h"
+#include "Combat/Projectile/ERNProjectileBase.h"
 #include "Components/ArrowComponent.h"
 #include "NiagaraFunctionLibrary.h"
 

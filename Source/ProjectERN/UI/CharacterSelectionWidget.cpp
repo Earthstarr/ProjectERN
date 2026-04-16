@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "UI/CharacterSelectionWidget.h"
-#include "Player/ERNPlayerState.h"
+#include "Character/Player/ERNPlayerState.h"
 #include "GameFramework/PlayerController.h"
 #include "Core/ERNGameInstance.h"
 

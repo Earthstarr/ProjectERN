@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 
-#include "Player/ERNPlayerController.h"
+#include "Character/Player/ERNPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Engine/LocalPlayer.h"
@@ -10,7 +10,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ProjectERN.h"
 #include "Widgets/Input/SVirtualJoystick.h"
-#include "Player/ERNPlayerState.h"
+#include "Character/Player/ERNPlayerState.h"
 #include "GameFramework/GameStateBase.h"
 #include "Core/ERNGameInstance.h"
 #include "Interfaces/IInteractable.h"

@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Character/Enemy/ERNEnemyCharacter.h"
-#include "Core/ERNAttributeSet.h"
+#include "GAS/ERNAttributeSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/WidgetComponent.h"
 #include "UI/ERNEnemyHealthBarWidget.h"

@@ -6,7 +6,7 @@
 #include "Components/WidgetComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/PlayerController.h"
-#include "Player/ERNPlayerController.h"
+#include "Character/Player/ERNPlayerController.h"
 
 ACharacterSelectionPedestal::ACharacterSelectionPedestal()
 {

@@ -12,10 +12,10 @@
 #include "InputActionValue.h"
 #include "ProjectERN.h"
 #include "AbilitySystemComponent.h"
-#include "Player/ERNPlayerState.h"
-#include "Core/Inventory/ERNInventoryComponent.h"
-#include "Core/Inventory/ERNEquipmentComponent.h"
-#include "Core/ERNGameplayTags.h"
+#include "Character/Player/ERNPlayerState.h"
+#include "Inventory/Components/ERNInventoryComponent.h"
+#include "Inventory/Components/ERNEquipmentComponent.h"
+#include "GAS/ERNGameplayTags.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 

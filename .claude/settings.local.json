@@ -6,7 +6,8 @@
       "Bash(del \"C:\\\\JW\\\\Unreal\\\\Project\\\\ProjectERN\\\\Config\\\\DefaultGameplayTags.ini\")",
       "Bash(git mv:*)",
       "Bash(move ProjectERNPlayerState.h ERNPlayerState.h)",
-      "Bash(move:*)"
+      "Bash(move:*)",
+      "Bash(xargs sed:*)"
     ]
   }
 }

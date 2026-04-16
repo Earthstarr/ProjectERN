@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "Core/Inventory/ERNWeaponBase.h"
+#include "Combat/Weapons/ERNWeaponBase.h"
 #include "Components/StaticMeshComponent.h"
 
 AERNWeaponBase::AERNWeaponBase()

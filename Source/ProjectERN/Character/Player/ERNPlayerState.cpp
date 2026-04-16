@@ -1,12 +1,12 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "Player/ERNPlayerState.h"
+#include "Character/Player/ERNPlayerState.h"
 #include "Net/UnrealNetwork.h"
 #include "Character/Player/ProjectERNCharacter.h"
-#include "Core/ERNAttributeSet.h"
+#include "GAS/ERNAttributeSet.h"
 #include "Core/ERNGameState.h"
 #include "GameFramework/PlayerController.h"
-#include "Core/Inventory/ERNEquipmentComponent.h"
+#include "Inventory/Components/ERNEquipmentComponent.h"
 #include "Core/ERNGameInstance.h"
 
 AERNPlayerState::AERNPlayerState()

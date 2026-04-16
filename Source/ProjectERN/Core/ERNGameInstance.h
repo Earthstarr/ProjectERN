@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "Interfaces/OnlineSessionInterface.h"
-#include "Player/ERNPlayerState.h"
+#include "Character/Player/ERNPlayerState.h"
 #include "ERNGameInstance.generated.h"
 
 UCLASS()

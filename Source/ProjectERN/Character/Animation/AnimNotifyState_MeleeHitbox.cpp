@@ -1,8 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Character/Animation/AnimNotifyState_MeleeHitbox.h"
-#include "Core/Inventory/ERNMeleeWeapon.h"
-#include "Core/Inventory/ERNEquipmentComponent.h"
+#include "Combat/Weapons/ERNMeleeWeapon.h"
+#include "Inventory/Components/ERNEquipmentComponent.h"
 #include "GameFramework/Character.h"
 
 void UAnimNotifyState_MeleeHitbox::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,

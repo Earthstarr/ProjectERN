@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Core/ERNGameMode.h"
-#include "Player/ERNPlayerState.h"
+#include "Character/Player/ERNPlayerState.h"
 #include "Character/Player/ProjectERNCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "Core/ERNGameInstance.h"

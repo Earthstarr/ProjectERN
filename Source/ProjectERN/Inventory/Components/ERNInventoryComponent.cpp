@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "Core/Inventory/ERNInventoryComponent.h"
+#include "Inventory/Components/ERNInventoryComponent.h"
 #include "Net/UnrealNetwork.h"
 
 UERNInventoryComponent::UERNInventoryComponent()

@@ -1,8 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Character/Animation/AnimNotify_SpawnProjectile.h"
-#include "Core/Inventory/ERNRangedWeapon.h"
-#include "Core/Inventory/ERNEquipmentComponent.h"
+#include "Combat/Weapons/ERNRangedWeapon.h"
+#include "Inventory/Components/ERNEquipmentComponent.h"
 #include "GameFramework/Character.h"
 
 void UAnimNotify_SpawnProjectile::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
