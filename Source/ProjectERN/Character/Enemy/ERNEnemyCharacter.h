@@ -87,6 +87,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	float AttackRange = 200.0f;
 
+	// 순찰 속도
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	float PatrolSpeed = 200.0f;
+
+	// 추적 속도
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	float ChaseSpeed = 450.0f;
+
+	// 순찰 포인트 배열 (TargetPoint 액터들)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	TArray<AActor*> PatrolPoints;
+
 protected:
 	// 드랍 처리
 	UFUNCTION(BlueprintCallable, Category = "Enemy")
