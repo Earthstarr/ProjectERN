@@ -11,6 +11,8 @@
 class UAbilitySystemComponent;
 class UERNAttributeSet;
 class UGameplayAbility;
+class UGameplayEffect;
+class UAnimMontage;
 
 
 UCLASS(Abstract)
@@ -58,4 +60,16 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Character")
 	bool IsDead() const { return bIsDead; }
+
+	// 경직 시스템
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void TryApplyStagger(float IncomingStaggerPower);
+
+	// 에디터에서 GE_Stagger 블루프린트 연결
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat|Stagger")
+	TSubclassOf<UGameplayEffect> StaggerEffect;
+
+	// 에디터에서 히트리액션 몽타주 연결
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat|Stagger")
+	TObjectPtr<UAnimMontage> HitReactionMontage;
 };

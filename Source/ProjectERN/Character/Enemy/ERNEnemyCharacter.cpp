@@ -47,6 +47,12 @@ void AERNEnemyCharacter::BeginPlay()
 		}
 	}
 
+	// 경직 저항력 초기값 적용
+	if (AttributeSet)
+	{
+		AttributeSet->InitStaggerResistance(InitialStaggerResistance);
+	}
+
 	// 서버에서만 히트박스 Overlap 바인딩
 	if (HasAuthority())
 	{
@@ -74,19 +80,22 @@ void AERNEnemyCharacter::OnHitboxOverlap(UPrimitiveComponent* OverlappedComp, AA
 
 	HitActors.Add(OtherActor);
 
-	// 태그로 데미지 값 검색
-	float DamageToApply = 10.f; // 기본값
+	// 태그로 데미지/경직력 검색
+	float DamageToApply = 10.f;
+	float StaggerPowerToApply = 10.f;
 	for (const FEnemyHitboxConfig& Config : HitboxConfigs)
 	{
 		if (OverlappedComp->ComponentHasTag(Config.Tag))
 		{
 			DamageToApply = Config.Damage;
+			StaggerPowerToApply = Config.StaggerPower;
 			break;
 		}
 	}
 
 	FDamageEvent DamageEvent;
 	Player->TakeDamage(DamageToApply, DamageEvent, GetController(), this);
+	Player->TryApplyStagger(StaggerPowerToApply);
 }
 
 float AERNEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

@@ -19,6 +19,7 @@ UERNAttributeSet::UERNAttributeSet()
 	InitMoveSpeed(600.f);
 	InitLevel(1.f);
 	InitGold(0.f);
+	InitStaggerResistance(10.f);
 }
 
 void UERNAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -36,6 +37,7 @@ void UERNAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_CONDITION_NOTIFY(UERNAttributeSet, MoveSpeed, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UERNAttributeSet, Level, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UERNAttributeSet, Gold, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UERNAttributeSet, StaggerResistance, COND_None, REPNOTIFY_Always);
 }
 
 void UERNAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
@@ -91,4 +93,9 @@ void UERNAttributeSet::OnRep_Level(const FGameplayAttributeData& OldLevel)
 void UERNAttributeSet::OnRep_Gold(const FGameplayAttributeData& OldGold)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UERNAttributeSet, Gold, OldGold);
+}
+
+void UERNAttributeSet::OnRep_StaggerResistance(const FGameplayAttributeData& OldStaggerResistance)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UERNAttributeSet, StaggerResistance, OldStaggerResistance);
 }

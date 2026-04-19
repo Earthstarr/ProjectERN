@@ -62,11 +62,16 @@ void AERNMeleeWeapon::OnHitboxOverlap(UPrimitiveComponent* OverlappedComp, AActo
 	UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OwnerCharacter);
 
 	// 태그로 강공 / 약공 구분
-	const float DamageToApply = ASC && ASC->HasMatchingGameplayTag(TAG_Ability_Attack_Heavy)
-		? HeavyAttackDamage
-		: LightAttackDamage;
+	const bool bIsHeavy = ASC && ASC->HasMatchingGameplayTag(TAG_Ability_Attack_Heavy);
+	const float DamageToApply = bIsHeavy ? HeavyAttackDamage : LightAttackDamage;
+	const float StaggerPower = bIsHeavy ? HeavyAttackStaggerPower : LightAttackStaggerPower;
 
 	OtherActor->TakeDamage(DamageToApply, FDamageEvent(), InstigatorController, GetOwner());
+
+	if (AERNEnemyCharacter* Enemy = Cast<AERNEnemyCharacter>(OtherActor))
+	{
+		Enemy->TryApplyStagger(StaggerPower);
+	}
 
 	// 히트 이펙트 - 모든 클라이언트에 멀티캐스트
 	if (HitEffect)

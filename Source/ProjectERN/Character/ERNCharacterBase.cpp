@@ -3,9 +3,11 @@
 #include "Character/ERNCharacterBase.h"
 #include "AbilitySystemComponent.h"
 #include "GAS/ERNAttributeSet.h"
+#include "GAS/ERNGameplayTags.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Abilities/GameplayAbility.h"
+#include "GameplayEffect.h"
 
 AERNCharacterBase::AERNCharacterBase()
 {
@@ -81,6 +83,41 @@ float AERNCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 	}
 
 	return ActualDamage;
+}
+
+void AERNCharacterBase::TryApplyStagger(float IncomingStaggerPower)
+{
+	if (!AbilitySystemComponent || !AttributeSet)
+	{
+		return;
+	}
+
+	// 슈퍼아머 또는 무적 프레임이면 경직 무시
+	if (AbilitySystemComponent->HasMatchingGameplayTag(TAG_State_SuperArmor) ||
+		AbilitySystemComponent->HasMatchingGameplayTag(TAG_State_StaggerImmune))
+	{
+		return;
+	}
+
+	// StaggerPower가 저항력 이상일 때만 경직 적용
+	if (IncomingStaggerPower < AttributeSet->GetStaggerResistance())
+	{
+		return;
+	}
+
+	// GE_Stagger 적용
+	if (StaggerEffect)
+	{
+		FGameplayEffectContextHandle Context = AbilitySystemComponent->MakeEffectContext();
+		AbilitySystemComponent->ApplyGameplayEffectToSelf(
+			StaggerEffect->GetDefaultObject<UGameplayEffect>(), 1.f, Context);
+	}
+
+	// 히트리액션 몽타주 재생
+	if (HitReactionMontage && GetMesh() && GetMesh()->GetAnimInstance())
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(HitReactionMontage);
+	}
 }
 
 void AERNCharacterBase::OnDeath()
