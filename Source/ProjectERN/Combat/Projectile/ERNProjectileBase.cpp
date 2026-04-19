@@ -8,6 +8,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Engine/DamageEvents.h"
 #include "Character/Enemy/ERNEnemyCharacter.h"
+#include "Character/Player/ProjectERNCharacter.h"
 
 AERNProjectileBase::AERNProjectileBase()
 {
@@ -64,10 +65,17 @@ void AERNProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
 		return;
 	}
 
-	// 적 캐릭터에게만 데미지 적용
-	if (OtherActor->IsA<AERNEnemyCharacter>())
+	// 적 → 플레이어 투사체
+	if (AERNEnemyCharacter* Enemy = Cast<AERNEnemyCharacter>(OtherActor))
 	{
-		OtherActor->TakeDamage(Damage, FDamageEvent(), GetInstigatorController(), GetOwner());
+		Enemy->TakeDamage(Damage, FDamageEvent(), GetInstigatorController(), GetOwner());
+		Enemy->TryApplyStagger(StaggerPower);
+	}
+	// 몬스터 → 플레이어 투사체
+	else if (AProjectERNCharacter* Player = Cast<AProjectERNCharacter>(OtherActor))
+	{
+		Player->TakeDamage(Damage, FDamageEvent(), GetInstigatorController(), GetOwner());
+		Player->TryApplyStagger(StaggerPower);
 	}
 
 	// 착탄 이펙트 - 모든 클라이언트에 멀티캐스트

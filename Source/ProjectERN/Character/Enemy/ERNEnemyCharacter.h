@@ -22,6 +22,10 @@ struct FEnemyHitboxConfig
 	// 이 히트박스가 줄 데미지
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Damage = 10.f;
+
+	// 이 히트박스가 줄 경직력
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float StaggerPower = 10.f;
 };
 
 USTRUCT(BlueprintType)
@@ -112,6 +116,10 @@ public:
 	// 경험치 보상
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Drops")
 	int32 ExpReward = 100;
+
+	// 경직 저항력 초기값 (BP마다 다르게 설정, BeginPlay에서 AttributeSet에 적용)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Combat")
+	float InitialStaggerResistance = 10.f;
 
 	// 근접 히트박스 설정 (태그로 구분, 태그별 데미지 값 설정)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")

@@ -59,4 +59,8 @@ public:
 	// 데미지 (무기의 AttackDamage가 여기로 전달됨)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Projectile")
 	float Damage = 20.0f;
+
+	// 경직력 (BP_투사체마다 다르게 설정)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Projectile")
+	float StaggerPower = 15.f;
 };

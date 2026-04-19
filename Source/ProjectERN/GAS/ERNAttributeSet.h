@@ -75,6 +75,11 @@ public:
 	FGameplayAttributeData Gold;
 	ATTRIBUTE_ACCESSORS(UERNAttributeSet, Gold)
 
+	// Stagger Resistance — 이 값보다 낮은 StaggerPower 공격은 경직 무시
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes", ReplicatedUsing = OnRep_StaggerResistance)
+	FGameplayAttributeData StaggerResistance;
+	ATTRIBUTE_ACCESSORS(UERNAttributeSet, StaggerResistance)
+
 protected:
 	UFUNCTION()
 	virtual void OnRep_Health(const FGameplayAttributeData& OldHealth);
@@ -108,4 +113,7 @@ protected:
 
 	UFUNCTION()
 	virtual void OnRep_Gold(const FGameplayAttributeData& OldGold);
+
+	UFUNCTION()
+	virtual void OnRep_StaggerResistance(const FGameplayAttributeData& OldStaggerResistance);
 };

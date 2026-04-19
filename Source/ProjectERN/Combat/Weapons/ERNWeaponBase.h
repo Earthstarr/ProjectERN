@@ -32,6 +32,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stats")
 	float HeavyAttackDamage = 20.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stats")
+	float LightAttackStaggerPower = 10.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stats")
+	float HeavyAttackStaggerPower = 25.f;
+
 	// 무기 전용 애니메이션 몽타주
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Animations")
 	UAnimMontage* LightAttackMontage;

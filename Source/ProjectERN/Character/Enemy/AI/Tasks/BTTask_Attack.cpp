@@ -4,6 +4,8 @@
 #include "AIController.h"
 #include "Character/Enemy/ERNEnemyCharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "AbilitySystemComponent.h"
+#include "GAS/ERNGameplayTags.h"
 
 UBTTask_Attack::UBTTask_Attack()
 {
@@ -29,6 +31,15 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	if (!Target)
 	{
 		return EBTNodeResult::Failed;
+	}
+
+	// 경직 상태면 공격 중단
+	if (UAbilitySystemComponent* ASC = Enemy->GetAbilitySystemComponent())
+	{
+		if (ASC->HasMatchingGameplayTag(TAG_State_Stagger))
+		{
+			return EBTNodeResult::Failed;
+		}
 	}
 
 	// 타겟 방향으로 회전
