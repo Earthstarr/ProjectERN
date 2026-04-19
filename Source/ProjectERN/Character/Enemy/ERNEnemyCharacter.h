@@ -7,6 +7,40 @@
 #include "ERNEnemyCharacter.generated.h"
 
 class UWidgetComponent;
+class AERNProjectileBase;
+class UBoxComponent;
+
+USTRUCT(BlueprintType)
+struct FEnemyHitboxConfig
+{
+	GENERATED_BODY()
+
+	// BoxComponent의 ComponentTag와 일치시킬 태그
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName Tag;
+
+	// 이 히트박스가 줄 데미지
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Damage = 10.f;
+};
+
+USTRUCT(BlueprintType)
+struct FEnemyProjectileConfig
+{
+	GENERATED_BODY()
+
+	// AnimNotify에서 참조할 태그
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName Tag;
+
+	// 스폰할 투사체 클래스
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AERNProjectileBase> ProjectileClass;
+
+	// 발사 소켓 이름 (스켈레탈 메시 소켓)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName SpawnSocket = TEXT("hand_r");
+};
 
 
  // 드랍 아이템 정보 
@@ -79,6 +113,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Drops")
 	int32 ExpReward = 100;
 
+	// 근접 히트박스 설정 (태그로 구분, 태그별 데미지 값 설정)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	TArray<FEnemyHitboxConfig> HitboxConfigs;
+
+	// 원거리 투사체 설정 (태그로 구분)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	TArray<FEnemyProjectileConfig> ProjectileConfigs;
+
 	// 탐지 범위
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	float DetectionRange = 1000.0f;
@@ -99,6 +141,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	TArray<AActor*> PatrolPoints;
 
+	// 한 번의 공격에서 중복 히트 방지
+	TArray<AActor*> HitActors;
+
+	// NotifyState End 시 호출
+	void ClearHitActors() { HitActors.Empty(); }
+
 protected:
 	// 드랍 처리
 	UFUNCTION(BlueprintCallable, Category = "Enemy")
@@ -107,4 +155,12 @@ protected:
 	// 골드 드롭
 	UFUNCTION(BlueprintCallable, Category = "Enemy")
 	virtual void SpawnGold();
+
+private:
+	UFUNCTION()
+	void OnHitboxOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+		bool bFromSweep, const FHitResult& SweepResult);
+
+	void BindHitboxOverlaps();
 };

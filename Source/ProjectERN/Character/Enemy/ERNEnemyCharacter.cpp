@@ -4,7 +4,10 @@
 #include "GAS/ERNAttributeSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Components/BoxComponent.h"
 #include "UI/ERNEnemyHealthBarWidget.h"
+#include "Character/Player/ProjectERNCharacter.h"
+#include "Engine/DamageEvents.h"
 
 AERNEnemyCharacter::AERNEnemyCharacter()
 {
@@ -43,6 +46,47 @@ void AERNEnemyCharacter::BeginPlay()
 			Widget->InitWidget(this);
 		}
 	}
+
+	// 서버에서만 히트박스 Overlap 바인딩
+	if (HasAuthority())
+	{
+		BindHitboxOverlaps();
+	}
+}
+
+void AERNEnemyCharacter::BindHitboxOverlaps()
+{
+	TArray<UBoxComponent*> Boxes;
+	GetComponents<UBoxComponent>(Boxes);
+
+	for (UBoxComponent* Box : Boxes)
+	{
+		Box->OnComponentBeginOverlap.AddDynamic(this, &AERNEnemyCharacter::OnHitboxOverlap);
+	}
+}
+
+void AERNEnemyCharacter::OnHitboxOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	// 플레이어만 대상, 중복 히트 방지
+	AProjectERNCharacter* Player = Cast<AProjectERNCharacter>(OtherActor);
+	if (!Player || HitActors.Contains(OtherActor)) return;
+
+	HitActors.Add(OtherActor);
+
+	// 태그로 데미지 값 검색
+	float DamageToApply = 10.f; // 기본값
+	for (const FEnemyHitboxConfig& Config : HitboxConfigs)
+	{
+		if (OverlappedComp->ComponentHasTag(Config.Tag))
+		{
+			DamageToApply = Config.Damage;
+			break;
+		}
+	}
+
+	FDamageEvent DamageEvent;
+	Player->TakeDamage(DamageToApply, DamageEvent, GetController(), this);
 }
 
 float AERNEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
