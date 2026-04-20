@@ -72,4 +72,8 @@ public:
 	// 에디터에서 히트리액션 몽타주 연결
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat|Stagger")
 	TObjectPtr<UAnimMontage> HitReactionMontage;
+
+	// 히트리액션 몽타주 재생 (모든 클라이언트에 동기화)
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayHitReaction();
 };

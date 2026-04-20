@@ -133,6 +133,17 @@ void AERNEnemyCharacter::Multicast_HideHealthBar_Implementation()
 	HealthBarWidget->SetVisibility(false);
 }
 
+void AERNEnemyCharacter::Multicast_PlayAttackMontage_Implementation(UAnimMontage* Montage)
+{
+	if (!Montage || !GetMesh()) return;
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && !AnimInstance->Montage_IsPlaying(Montage))
+	{
+		AnimInstance->Montage_Play(Montage);
+	}
+}
+
 void AERNEnemyCharacter::OnDeath()
 {
 	Super::OnDeath();
