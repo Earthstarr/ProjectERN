@@ -47,15 +47,12 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	Direction.Z = 0.f;
 	Enemy->SetActorRotation(Direction.Rotation());
 
-	// 공격 몽타주 재생 (데미지는 AnimNotifyState_EnemyMeleeHitbox / AnimNotify_EnemySpawnProjectile에서 처리)
-	if (AttackMontage && Enemy->GetMesh())
+	// 공격 몽타주 재생 (Multicast로 모든 클라이언트에 동기화)
+	// 데미지는 AnimNotifyState_EnemyMeleeHitbox / AnimNotify_EnemySpawnProjectile에서 처리
+	if (AttackMontage)
 	{
-		UAnimInstance* AnimInstance = Enemy->GetMesh()->GetAnimInstance();
-		if (AnimInstance && !AnimInstance->Montage_IsPlaying(AttackMontage))
-		{
-			AnimInstance->Montage_Play(AttackMontage);
-			UE_LOG(LogTemp, Log, TEXT("[%s] Attack montage played on %s"), *Enemy->GetName(), *Target->GetName());
-		}
+		Enemy->Multicast_PlayAttackMontage(AttackMontage);
+		UE_LOG(LogTemp, Log, TEXT("[%s] Attack montage multicast on %s"), *Enemy->GetName(), *Target->GetName());
 	}
 
 	return EBTNodeResult::Succeeded;

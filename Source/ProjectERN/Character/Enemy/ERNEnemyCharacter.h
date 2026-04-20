@@ -84,6 +84,10 @@ public:
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "UI")
 	void Multicast_HideHealthBar();
 
+	// 공격 몽타주 재생 (모든 클라이언트에 동기화)
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Combat")
+	void Multicast_PlayAttackMontage(UAnimMontage* Montage);
+
 protected:
 	virtual void BeginPlay() override;
 

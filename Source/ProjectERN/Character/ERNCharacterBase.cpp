@@ -113,10 +113,21 @@ void AERNCharacterBase::TryApplyStagger(float IncomingStaggerPower)
 			StaggerEffect->GetDefaultObject<UGameplayEffect>(), 1.f, Context);
 	}
 
-	// 히트리액션 몽타주 재생
-	if (HitReactionMontage && GetMesh() && GetMesh()->GetAnimInstance())
+	// 히트리액션 몽타주 재생 (Multicast로 모든 클라이언트에 동기화)
+	if (HitReactionMontage)
 	{
-		GetMesh()->GetAnimInstance()->Montage_Play(HitReactionMontage);
+		Multicast_PlayHitReaction();
+	}
+}
+
+void AERNCharacterBase::Multicast_PlayHitReaction_Implementation()
+{
+	if (!HitReactionMontage || !GetMesh()) return;
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		AnimInstance->Montage_Play(HitReactionMontage);
 	}
 }
 
