@@ -14,7 +14,6 @@ AERNEnemyCharacter::AERNEnemyCharacter()
 	// AI가 자동으로 빙의하도록 설정
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-	// 적은 기본적으로 회전하지 않음
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 200.0f, 0.0f);
@@ -167,7 +166,7 @@ void AERNEnemyCharacter::OnDeath()
 
 void AERNEnemyCharacter::SpawnDrops()
 {
-	// TODO: 드롭 테이블 기반으로 아이템 스폰
+	// TODO: 드랍 테이블 기반으로 아이템 스폰
 	for (const FDropItemInfo& DropInfo : DropTable)
 	{
 		float RandomValue = FMath::FRand();
